@@ -1,0 +1,1 @@
+UPDATE weather SET cloud_cover = ?, temperature = ? WHERE datetime = ?
