@@ -6,5 +6,5 @@ class BaseElectricityPriceAPI(ABC):
         pass
 
     @abstractmethod
-    def get_electricity_pirce(self):
+    def get_electricity_price(self):
         pass

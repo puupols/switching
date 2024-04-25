@@ -1,0 +1,1 @@
+UPDATE electricity_price SET price = ? WHERE datetime = ?

@@ -3,6 +3,6 @@ import requests
 
 class NordpoolElectricityPriceAPI(BaseElectricityPriceAPI):
 
-    def get_electricity_pirce(self):
+    def get_electricity_price(self):
         resp = requests.get('https://www.nordpoolgroup.com/api/marketdata/page/59')
-        print(resp.json())
+        return resp.json()

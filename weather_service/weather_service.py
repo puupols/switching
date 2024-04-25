@@ -14,3 +14,6 @@ class WeatherService:
         data = self.weather_api.get_weather_data(latitude, longitude)
         processed_data = self.weather_processor.process_raw_data(data)
         self.repository_service.store_weather_data(processed_data)
+
+    def get_weather_data_after_date(self, date):
+        return self.repository_service.get_weather_data_after_date(date)

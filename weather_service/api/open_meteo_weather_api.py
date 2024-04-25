@@ -4,7 +4,7 @@ import requests
 class OpenMeteoWeatherAPI(BaseWeatherAPI):
 
     weather_data_types = 'cloud_cover,temperature'
-    forecast_days = '1'
+    forecast_days = '3'
     timezone = 'EET'
     url_base = 'https://api.open-meteo.com/v1/forecast?'
 

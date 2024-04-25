@@ -1,0 +1,1 @@
+SELECT id, datetime, cloud_cover, temperature FROM weather where datetime > ?
