@@ -1,6 +1,6 @@
-from configuration.base_configuration import BaseConfiguration
+from src.configuration.base_configuration import BaseConfiguration
 from weather_service.weather_service import WeatherService
-from electricity_price_service.electricity_price_service import ElectricityPriceService
+from src.electricity_price_service.electricity_price_service import ElectricityPriceService
 import importlib.util
 import sys
 
@@ -17,7 +17,7 @@ class SwitchService:
         allowed_switch_names = self.configuration.get('allowed_switch_names')
         if switch_name in allowed_switch_names:
             try:
-                module_path = 'switch_service/switch_statuses/' + switch_name + '.py'
+                module_path = 'src/switch_service/switch_statuses/' + switch_name + '.py'
                 module_name = switch_name
                 spec = importlib.util.spec_from_file_location(module_name, module_path)
                 module = importlib.util.module_from_spec(spec)

@@ -1,6 +1,6 @@
 from weather_service.api.base_weather_api import BaseWeatherAPI
 from weather_service.processors.base_weather_processor import BaseWeatherProcessor
-from repository_service.base_repository_service import BaseRepositoryService
+from src.repository_service.base_repository_service import BaseRepositoryService
 
 class WeatherService:
 

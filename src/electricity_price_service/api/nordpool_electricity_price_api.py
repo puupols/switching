@@ -1,4 +1,4 @@
-from electricity_price_service.api.base_electricity_price_api import BaseElectricityPriceAPI
+from src.electricity_price_service.api.base_electricity_price_api import BaseElectricityPriceAPI
 import requests
 
 class NordpoolElectricityPriceAPI(BaseElectricityPriceAPI):

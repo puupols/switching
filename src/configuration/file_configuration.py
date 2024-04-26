@@ -1,5 +1,5 @@
 import json
-from configuration.base_configuration import BaseConfiguration
+from src.configuration.base_configuration import BaseConfiguration
 
 
 class FileConfiguration(BaseConfiguration):
@@ -10,5 +10,5 @@ class FileConfiguration(BaseConfiguration):
         return self.configuration.get(key)
 
     def _get_configuration_from_file(self):
-        with open('switching.conf', 'r') as config_file:
+        with open('src/switching.conf', 'r') as config_file:
             return json.loads(config_file.read())

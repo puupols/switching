@@ -1,6 +1,6 @@
-from electricity_price_service.processors.base_electricity_price_processor import BaseElectricityPriceProcessor
+from src.electricity_price_service.processors.base_electricity_price_processor import BaseElectricityPriceProcessor
 from datetime import datetime
-from electricity_price_service.models.electricity_price_model import ElectricityPriceModel
+from src.electricity_price_service.models.electricity_price_model import ElectricityPriceModel
 
 class NordpoolElectricityPriceProcessor(BaseElectricityPriceProcessor):
 

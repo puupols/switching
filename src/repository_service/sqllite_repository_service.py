@@ -1,7 +1,7 @@
 from contextlib import contextmanager
-from repository_service.base_repository_service import BaseRepositoryService
+from src.repository_service.base_repository_service import BaseRepositoryService
 from weather_service.models.weather_model import WeatherModel
-from electricity_price_service.models.electricity_price_model import ElectricityPriceModel
+from src.electricity_price_service.models.electricity_price_model import ElectricityPriceModel
 import sqlite3
 
 
@@ -9,14 +9,14 @@ class SQLLiteRepositoryService(BaseRepositoryService):
 
     def __init__(self):
         super().__init__()
-        self.db_path = 'repository_service/sql_lite_db/switching.db'
-        self.base_sql_path = 'repository_service/sql_lite_db/sql/'
+        self.db_path = 'src/repository_service/sql_lite_db/switching.db'
+        self.base_sql_path = 'src/repository_service/sql_lite_db/sql/'
         self.initialize_database()
 
     def initialize_database(self):
-        connection = sqlite3.connect('repository_service/sql_lite_db/switching.db')
+        connection = sqlite3.connect(self.db_path)
         cursor = connection.cursor()
-        init_query = self._load_sql_query('repository_service/sql_lite_db/sql/initialize/initialize_database.sql')
+        init_query = self._load_sql_query(self.base_sql_path + 'initialize/initialize_database.sql')
         cursor.executescript(init_query)
         connection.commit()
         connection.close()

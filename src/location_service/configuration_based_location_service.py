@@ -1,5 +1,5 @@
-from location_service.base_location_service import BaseLocationService
-from configuration.base_configuration import BaseConfiguration
+from src.location_service.base_location_service import BaseLocationService
+from src.configuration.base_configuration import BaseConfiguration
 
 class ConfigurationBasedLocationService(BaseLocationService):
 
