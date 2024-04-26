@@ -14,3 +14,6 @@ class ElectricityPriceService:
         raw_data = self.electricity_price_api.get_electricity_price()
         processed_data = self.electricity_price_processor.process_data(raw_data)
         self.repository_service.store_electricity_price_data(processed_data)
+
+    def get_electricity_price_data_after_date(self, date):
+        return self.repository_service.get_electricity_price_data_after_date(date)

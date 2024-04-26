@@ -82,3 +82,15 @@ class SQLLiteRepositoryService(BaseRepositoryService):
             result = cursor.fetchall()
 
         return result
+
+    def get_electricity_price_data_after_date(self, date):
+        select_statement = self._load_sql_query(
+            self.base_sql_path + 'electricity_price/get_electricity_price_after_date.sql')
+
+        params = {'datetime': date}
+
+        with self.db_connection() as cursor:
+            cursor.execute(select_statement, params)
+            result = cursor.fetchall()
+
+        return result

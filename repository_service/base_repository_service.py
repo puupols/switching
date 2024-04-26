@@ -15,3 +15,7 @@ class BaseRepositoryService:
     @abstractmethod
     def get_weather_data_after_date(self, date):
         pass
+
+    @abstractmethod
+    def get_electricity_price_data_after_date(self, date):
+        pass

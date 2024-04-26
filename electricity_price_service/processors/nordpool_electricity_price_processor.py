@@ -9,7 +9,7 @@ class NordpoolElectricityPriceProcessor(BaseElectricityPriceProcessor):
         for i in range(24):
             raw_time = raw_data['data']['Rows'][i]['Name']
             raw_date = raw_data['data']['Rows'][i]['Columns'][0]['Name']
-            price = raw_data['data']['Rows'][i]['Columns'][0]['Value']
+            price = float(raw_data['data']['Rows'][i]['Columns'][0]['Value'].replace(',', '.'))
             price_date_string = raw_date + 'T' + raw_time[:2:]
             price_date = datetime.strptime(price_date_string, '%d-%m-%YT%H')
             electricity_price = ElectricityPriceModel(price_date, price)
