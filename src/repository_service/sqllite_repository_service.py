@@ -3,6 +3,7 @@ from src.repository_service.base_repository_service import BaseRepositoryService
 from src.weather_service.models.weather_model import WeatherModel
 from src.electricity_price_service.models.electricity_price_model import ElectricityPriceModel
 import sqlite3
+import logging
 
 
 class SQLLiteRepositoryService(BaseRepositoryService):
@@ -12,6 +13,7 @@ class SQLLiteRepositoryService(BaseRepositoryService):
         self.db_path = 'src/repository_service/sql_lite_db/switching.db'
         self.base_sql_path = 'src/repository_service/sql_lite_db/sql/'
         self.initialize_database()
+        self.logger = logging.getLogger(__name__)
 
     def initialize_database(self):
         connection = sqlite3.connect(self.db_path)
@@ -33,7 +35,7 @@ class SQLLiteRepositoryService(BaseRepositoryService):
         try:
             yield cursor
         except Exception as e:
-            print(f'An error occurred during the database request, the error: {e}')
+            self.logger.exception(f'An error occurred during the database request, the error: {e}')
         finally:
             connection.commit()
             connection.close()
@@ -50,8 +52,8 @@ class SQLLiteRepositoryService(BaseRepositoryService):
         params_list = [get_params(weather) for weather in weather_data]
 
         with self.db_connection() as cursor:
-            cursor.executemany(insert_statement, params_list)
             cursor.executemany(update_statement, params_list)
+            cursor.executemany(insert_statement, params_list)
 
     def store_electricity_price_data(self, electricity_prices: [ElectricityPriceModel]):
 
@@ -69,8 +71,8 @@ class SQLLiteRepositoryService(BaseRepositoryService):
         electricity_params_list = [get_params(electricity_price) for electricity_price in electricity_prices]
 
         with self.db_connection() as cursor:
-            cursor.executemany(insert_statement, electricity_params_list)
             cursor.executemany(update_statement, electricity_params_list)
+            cursor.executemany(insert_statement, electricity_params_list)
 
     def get_weather_data_after_date(self, date):
         select_statement = self._load_sql_query(
