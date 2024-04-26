@@ -1,1 +1,1 @@
-UPDATE electricity_price SET price = ? WHERE datetime = ?
+UPDATE electricity_price SET price = :price WHERE datetime = :datetime

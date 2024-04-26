@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from repository_service.base_repository_service import BaseRepositoryService
 from weather_service.models.weather_model import WeatherModel
 from electricity_price_service.models.electricity_price_model import ElectricityPriceModel
@@ -8,6 +9,8 @@ class SQLLiteRepositoryService(BaseRepositoryService):
 
     def __init__(self):
         super().__init__()
+        self.db_path = 'repository_service/sql_lite_db/switching.db'
+        self.base_sql_path = 'repository_service/sql_lite_db/sql/'
         self.initialize_database()
 
     def initialize_database(self):
@@ -22,36 +25,60 @@ class SQLLiteRepositoryService(BaseRepositoryService):
         with open(file_path, 'r') as file:
             return file.read()
 
+    @contextmanager
+    def db_connection(self):
+        connection = sqlite3.connect(self.db_path)
+        cursor = connection.cursor()
+        try:
+            yield cursor
+        except Exception as e:
+            print(f'An error occurred during the database request, the error: {e}')
+        finally:
+            connection.commit()
+            connection.close()
 
     def store_weather_data(self, weather_data: [WeatherModel]):
-        connection = sqlite3.connect('repository_service/sql_lite_db/switching.db')
-        cursor = connection.cursor()
-        insert_statement = self._load_sql_query('repository_service/sql_lite_db/sql/weather/insert_weather.sql')
-        update_statement = self._load_sql_query('repository_service/sql_lite_db/sql/weather/update_weather.sql')
-        for weather in weather_data:
-            cursor.execute(insert_statement, (weather.datetime, weather.cloud_cover, weather.temperature, weather.datetime))
-            cursor.execute(update_statement, (weather.cloud_cover, weather.temperature, weather.datetime))
-        connection.commit()
-        connection.close()
+        insert_statement = self._load_sql_query(self.base_sql_path + 'weather/insert_weather.sql')
+        update_statement = self._load_sql_query(self.base_sql_path + 'weather/update_weather.sql')
+
+        def get_params(weather):
+            return {'datetime': weather.datetime, 'cloud_cover': weather.cloud_cover,
+                    'temperature': weather.temperature, 'latitude': weather.latitude,
+                    'longitude': weather.longitude}
+
+        params_list = [get_params(weather) for weather in weather_data]
+
+        with self.db_connection() as cursor:
+            cursor.executemany(insert_statement, params_list)
+            cursor.executemany(update_statement, params_list)
 
     def store_electricity_price_data(self, electricity_prices: [ElectricityPriceModel]):
-        connection = sqlite3.connect('repository_service/sql_lite_db/switching.db')
-        cursor = connection.cursor()
-        insert_statement = self._load_sql_query('repository_service/sql_lite_db/sql/electricity_price/insert_electricity_price.sql')
-        update_statement = self._load_sql_query('repository_service/sql_lite_db/sql/electricity_price/update_electricity_price.sql')
-        for electricity_price in electricity_prices:
-            cursor.execute(insert_statement,
-                           (electricity_price.datetime, electricity_price.price, electricity_price.datetime))
-            cursor.execute(update_statement, (electricity_price.price, electricity_price.datetime))
-        connection.commit()
-        connection.close()
+
+        insert_statement = self._load_sql_query(
+            self.base_sql_path + 'electricity_price/insert_electricity_price.sql')
+        update_statement = self._load_sql_query(
+            self.base_sql_path + 'electricity_price/update_electricity_price.sql')
+
+        def get_params(electricity_price):
+            return {
+                'datetime': electricity_price.datetime,
+                'price': electricity_price.price
+            }
+
+        electricity_params_list = [get_params(electricity_price) for electricity_price in electricity_prices]
+
+        with self.db_connection() as cursor:
+            cursor.executemany(insert_statement, electricity_params_list)
+            cursor.executemany(update_statement, electricity_params_list)
 
     def get_weather_data_after_date(self, date):
-        connection = sqlite3.connect('repository_service/sql_lite_db/switching.db')
-        cursor = connection.cursor()
         select_statement = self._load_sql_query(
-            'repository_service/sql_lite_db/sql/weather/get_weather_data_after_date.sql')
-        cursor.execute(select_statement, (date,))
-        result = cursor.fetchall()
-        connection.close()
+            self.base_sql_path + 'weather/get_weather_data_after_date.sql')
+
+        params = {'datetime': date}
+
+        with self.db_connection() as cursor:
+            cursor.execute(select_statement, params)
+            result = cursor.fetchall()
+
         return result

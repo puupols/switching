@@ -1,1 +1,1 @@
-SELECT id, datetime, cloud_cover, temperature FROM weather where datetime > ?
+SELECT id, datetime, cloud_cover, temperature, latitude, longitude FROM weather where datetime > :datetime
