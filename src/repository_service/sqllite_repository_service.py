@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from src.repository_service.base_repository_service import BaseRepositoryService
-from weather_service.models.weather_model import WeatherModel
+from src.weather_service.models.weather_model import WeatherModel
 from src.electricity_price_service.models.electricity_price_model import ElectricityPriceModel
 import sqlite3
 
@@ -29,6 +29,7 @@ class SQLLiteRepositoryService(BaseRepositoryService):
     def db_connection(self):
         connection = sqlite3.connect(self.db_path)
         cursor = connection.cursor()
+        cursor.row_factory = sqlite3.Row
         try:
             yield cursor
         except Exception as e:
@@ -79,8 +80,8 @@ class SQLLiteRepositoryService(BaseRepositoryService):
 
         with self.db_connection() as cursor:
             cursor.execute(select_statement, params)
-            result = cursor.fetchall()
-
+            rows = cursor.fetchall()
+        result = [WeatherModel(row['datetime'], row['cloud_cover'], row['temperature'], row['latitude'], row['longitude']) for row in rows]
         return result
 
     def get_electricity_price_data_after_date(self, date):
@@ -91,6 +92,6 @@ class SQLLiteRepositoryService(BaseRepositoryService):
 
         with self.db_connection() as cursor:
             cursor.execute(select_statement, params)
-            result = cursor.fetchall()
-
+            rows = cursor.fetchall()
+        result = [ElectricityPriceModel(row['datetime'], row['price']) for row in rows]
         return result
