@@ -14,7 +14,7 @@ class FlaskRESTAPI:
 
 
     def run_app(self):
-        self.app.run(debug=True)
+        self.app.run(debug=False)
 
     def setup_routes(self):
 
