@@ -1,5 +1,5 @@
-from weather_service.processors.base_weather_processor import BaseWeatherProcessor
-from weather_service.models.weather_model import WeatherModel
+from src.weather_service.processors.base_weather_processor import BaseWeatherProcessor
+from src.weather_service.models.weather_model import WeatherModel
 from datetime import datetime
 
 class OpenMeteoWeatherProcessor(BaseWeatherProcessor):

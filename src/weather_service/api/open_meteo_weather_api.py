@@ -1,4 +1,4 @@
-from weather_service.api.base_weather_api import BaseWeatherAPI
+from src.weather_service.api.base_weather_api import BaseWeatherAPI
 import requests
 
 class OpenMeteoWeatherAPI(BaseWeatherAPI):
