@@ -6,7 +6,7 @@ class OpenMeteoWeatherAPI(BaseWeatherAPI):
 
     def __init__(self, configuration):
         super().__init__(configuration)
-        self.weather_data_types = 'cloud_cover,temperature'
+        self.weather_data_types = 'cloud_cover,temperature,sunshine_duration'
         self.forecast_days = '3'
         self.timezone = 'EET'
 

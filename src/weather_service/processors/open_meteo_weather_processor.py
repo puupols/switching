@@ -14,7 +14,8 @@ class OpenMeteoWeatherProcessor(BaseWeatherProcessor):
             date_obj = datetime.strptime(date_string, '%Y-%m-%dT%H:%M')
             cloud_cover = raw_data['hourly']['cloud_cover'][i]
             temperature = raw_data['hourly']['temperature'][i]
-            weather = WeatherModel(date_obj, cloud_cover, temperature, latitude, longitude)
+            sunshine_duration = raw_data['hourly']['sunshine_duration'][i]
+            weather = WeatherModel(date_obj, cloud_cover, temperature, latitude, longitude, sunshine_duration)
             weather_data.append(weather)
 
         return weather_data

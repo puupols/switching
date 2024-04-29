@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS weather
                              datetime TEXT,
                              cloud_cover INTEGER,
                              temperature REAL,
+                             sunshine_duration REAL,
                              latitude REAL,
                              longitude REAL);
 

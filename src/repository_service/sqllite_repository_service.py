@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from src.repository_service.base_repository_service import BaseRepositoryService
 from src.weather_service.models.weather_model import WeatherModel
 from src.electricity_price_service.models.electricity_price_model import ElectricityPriceModel
+from typing import List
 import sqlite3
 import logging
 
@@ -40,14 +41,14 @@ class SQLLiteRepositoryService(BaseRepositoryService):
             connection.commit()
             connection.close()
 
-    def store_weather_data(self, weather_data: [WeatherModel]):
+    def store_weather_data(self, weather_data: List[WeatherModel]):
         insert_statement = self._load_sql_query(self.base_sql_path + 'weather/insert_weather.sql')
         update_statement = self._load_sql_query(self.base_sql_path + 'weather/update_weather.sql')
 
         def get_params(weather):
             return {'datetime': weather.datetime, 'cloud_cover': weather.cloud_cover,
                     'temperature': weather.temperature, 'latitude': weather.latitude,
-                    'longitude': weather.longitude}
+                    'longitude': weather.longitude, 'sunshine_duration': weather.sunshine_duration}
 
         params_list = [get_params(weather) for weather in weather_data]
 
@@ -55,7 +56,7 @@ class SQLLiteRepositoryService(BaseRepositoryService):
             cursor.executemany(update_statement, params_list)
             cursor.executemany(insert_statement, params_list)
 
-    def store_electricity_price_data(self, electricity_prices: [ElectricityPriceModel]):
+    def store_electricity_price_data(self, electricity_prices: List[ElectricityPriceModel]):
 
         insert_statement = self._load_sql_query(
             self.base_sql_path + 'electricity_price/insert_electricity_price.sql')
@@ -83,7 +84,7 @@ class SQLLiteRepositoryService(BaseRepositoryService):
         with self.db_connection() as cursor:
             cursor.execute(select_statement, params)
             rows = cursor.fetchall()
-        result = [WeatherModel(row['datetime'], row['cloud_cover'], row['temperature'], row['latitude'], row['longitude']) for row in rows]
+        result = [WeatherModel(row['datetime'], row['cloud_cover'], row['temperature'], row['latitude'], row['longitude'], row['sunshine_duration']) for row in rows]
         return result
 
     def get_electricity_price_data_after_date(self, date):
