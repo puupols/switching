@@ -39,6 +39,6 @@ class SwitchService:
         try:
             module = self._load_module(switch_name)
             return module.get_switch_status(self.weather_service, self.electricity_price_service)
-        except AttributeError as e:
+        except Exception as e:
             self.logger.exception(f'Error occurred during the call to get_switch_status for a switch {switch_name}.')
             return 'ERROR'

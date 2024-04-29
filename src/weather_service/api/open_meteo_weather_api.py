@@ -1,18 +1,21 @@
 from src.weather_service.api.base_weather_api import BaseWeatherAPI
 import requests
 
+
 class OpenMeteoWeatherAPI(BaseWeatherAPI):
 
-    weather_data_types = 'cloud_cover,temperature'
-    forecast_days = '3'
-    timezone = 'EET'
-    url_base = 'https://api.open-meteo.com/v1/forecast?'
+    def __init__(self, configuration):
+        super().__init__(configuration)
+        self.weather_data_types = 'cloud_cover,temperature'
+        self.forecast_days = '3'
+        self.timezone = 'EET'
 
     def get_weather_data(self, latitude, longitude):
-        position = f'latitude={latitude}&longitude={longitude}'
-        data_types = f'hourly={self.weather_data_types}'
-        days = f'forecast_days={self.forecast_days}'
-        zone = f'timezone={self.timezone}'
-        url = self.url_base + position + '&' + data_types + '&' + days + '&' + zone
+        open_meteo_url = self.configuration.get('open_meteo_url')
+        url = open_meteo_url.format(latitude=latitude,
+                                    longitude=longitude,
+                                    weather_data_types=self.weather_data_types,
+                                    forecast_days=self.forecast_days,
+                                    timezone=self.timezone)
         resp = requests.get(url)
         return resp.json()

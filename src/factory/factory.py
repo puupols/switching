@@ -8,7 +8,6 @@ from src.repository_service.sqllite_repository_service import SQLLiteRepositoryS
 
 
 def get_location_service_from_config(configuration: BaseConfiguration):
-
     location_service_configuration = configuration.get('location_service')
     if location_service_configuration == 'configuration_file':
         return ConfigurationBasedLocationService(configuration)
@@ -17,22 +16,26 @@ def get_location_service_from_config(configuration: BaseConfiguration):
 def get_weather_api_from_config(configuration: BaseConfiguration):
     weather_api_configuration = configuration.get('weather_service')
     if weather_api_configuration == 'open_meteo':
-        return OpenMeteoWeatherAPI()
+        return OpenMeteoWeatherAPI(configuration)
+
 
 def get_electricity_price_api(configuration: BaseConfiguration):
     electricity_price_api_configuration = configuration.get('electricity_price_service')
     if electricity_price_api_configuration == 'nordpool':
-        return NordpoolElectricityPriceAPI()
+        return NordpoolElectricityPriceAPI(configuration)
+
 
 def get_electricity_price_processor(configuration: BaseConfiguration):
     electricity_price_processor_configuration = configuration.get('electricity_price_service')
     if electricity_price_processor_configuration == 'nordpool':
         return NordpoolElectricityPriceProcessor()
 
+
 def get_weather_processor(configuration: BaseConfiguration):
     weather_processor_configuration = configuration.get('weather_service')
     if weather_processor_configuration == 'open_meteo':
         return OpenMeteoWeatherProcessor()
+
 
 def get_repository_service(configuration: BaseConfiguration):
     repository_service_configuration = configuration.get('repository_service')
