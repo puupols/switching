@@ -1,12 +1,15 @@
 from src.configuration.base_configuration import BaseConfiguration
 from src.weather_service.weather_service import WeatherService
 from src.electricity_price_service.electricity_price_service import ElectricityPriceService
+import inject
 import importlib.util
 import sys
 import logging
 
 
 class SwitchService:
+
+    @inject.autoparams()
     def __init__(self, configuration: BaseConfiguration,
                  weather_service: WeatherService,
                  electricity_price_service: ElectricityPriceService):

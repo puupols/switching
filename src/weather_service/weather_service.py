@@ -1,3 +1,4 @@
+import inject
 from src.weather_service.api.base_weather_api import BaseWeatherAPI
 from src.weather_service.processors.base_weather_processor import BaseWeatherProcessor
 from src.repository_service.base_repository_service import BaseRepositoryService
@@ -5,6 +6,7 @@ from src.location_service.base_location_service import BaseLocationService
 
 class WeatherService:
 
+    @inject.autoparams()
     def __init__(self, weather_api: BaseWeatherAPI, weather_processor: BaseWeatherProcessor,
                  repository_service: BaseRepositoryService,
                  location_service: BaseLocationService):

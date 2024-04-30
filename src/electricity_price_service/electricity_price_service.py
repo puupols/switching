@@ -1,9 +1,11 @@
+import inject
 from src.electricity_price_service.api.base_electricity_price_api import BaseElectricityPriceAPI
 from src.electricity_price_service.processors.base_electricity_price_processor import BaseElectricityPriceProcessor
 from src.repository_service.base_repository_service import BaseRepositoryService
 
 class ElectricityPriceService:
 
+    @inject.autoparams()
     def __init__(self, electricity_price_api: BaseElectricityPriceAPI, electricity_price_processor: BaseElectricityPriceProcessor,
                  repository_service: BaseRepositoryService):
         self.electricity_price_api = electricity_price_api

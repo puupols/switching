@@ -1,3 +1,4 @@
+import inject
 from apscheduler.schedulers.background import BackgroundScheduler
 from src.electricity_price_service.electricity_price_service import ElectricityPriceService
 from src.weather_service.weather_service import WeatherService
@@ -6,6 +7,7 @@ from src.configuration.base_configuration import BaseConfiguration
 
 class JobService:
 
+    @inject.autoparams()
     def __init__(self, weather_service: WeatherService,
                  electricity_price_service: ElectricityPriceService,
                  configuration: BaseConfiguration):

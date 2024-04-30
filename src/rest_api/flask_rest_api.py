@@ -1,9 +1,14 @@
+from src.switch_service.switch_service import SwitchService
+from src.configuration.base_configuration import BaseConfiguration
+import inject
 from flask import Flask, request
 from flask_httpauth import HTTPBasicAuth
 
 
 class FlaskRESTAPI:
-    def __init__(self, switch_service, configuration):
+
+    @inject.autoparams()
+    def __init__(self, switch_service: SwitchService, configuration: BaseConfiguration):
         self.switch_service = switch_service
         self.configuration = configuration
         self.app = Flask('__name__')
