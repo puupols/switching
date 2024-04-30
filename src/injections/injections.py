@@ -1,4 +1,4 @@
-import inject
+import logging
 from src.configuration.base_configuration import BaseConfiguration
 from src.configuration.file_configuration import FileConfiguration
 from src.electricity_price_service.api.base_electricity_price_api import BaseElectricityPriceAPI
@@ -16,24 +16,38 @@ from src.repository_service.sqllite_repository_service import SQLLiteRepositoryS
 
 
 def app_injection_configuration(binder):
-    # Bind configuration instance
-    configuration_instance = FileConfiguration()
-    binder.bind(BaseConfiguration, configuration_instance)
 
-    if configuration_instance.get('location_service') == 'configuration_file':
-        binder.bind(BaseLocationService, ConfigurationBasedLocationService(configuration_instance))
+    logger = logging.getLogger(__name__)
+    try:
+        # Bind configuration instance
+        configuration_instance = FileConfiguration()
+        binder.bind(BaseConfiguration, configuration_instance)
 
-    if configuration_instance.get('weather_service') == 'open_meteo':
-        binder.bind(BaseWeatherAPI, OpenMeteoWeatherAPI(configuration_instance))
+        location_service_config = configuration_instance.get('location_service')
+        if location_service_config == 'configuration_file':
+            binder.bind(BaseLocationService, ConfigurationBasedLocationService(configuration_instance))
+        else:
+            raise ValueError(f'Unsupported location service: {location_service_config}')
 
-    if configuration_instance.get('weather_service') == 'open_meteo':
-        binder.bind(BaseWeatherProcessor, OpenMeteoWeatherProcessor())
+        weather_service_config = configuration_instance.get('weather_service')
+        if configuration_instance.get('weather_service') == 'open_meteo':
+            binder.bind(BaseWeatherAPI, OpenMeteoWeatherAPI(configuration_instance))
+            binder.bind(BaseWeatherProcessor, OpenMeteoWeatherProcessor())
+        else:
+            raise ValueError(f'Unsupported weather api service: {weather_service_config}')
 
-    if configuration_instance.get('electricity_price_service') == 'nordpool':
-        binder.bind(BaseElectricityPriceAPI, NordpoolElectricityPriceAPI(configuration_instance))
+        electricity_price_api_config = configuration_instance.get('electricity_price_service')
+        if electricity_price_api_config == 'nordpool':
+            binder.bind(BaseElectricityPriceAPI, NordpoolElectricityPriceAPI(configuration_instance))
+            binder.bind(BaseElectricityPriceProcessor, NordpoolElectricityPriceProcessor())
+        else:
+            raise ValueError(f'Unsupported electricity price api service: {electricity_price_api_config}')
 
-    if configuration_instance.get('electricity_price_service') == 'nordpool':
-        binder.bind(BaseElectricityPriceProcessor, NordpoolElectricityPriceProcessor())
-
-    if configuration_instance.get('repository_service') == 'sqllite':
-        binder.bind(BaseRepositoryService, SQLLiteRepositoryService())
+        repository_service_config = configuration_instance.get('repository_service')
+        if repository_service_config == 'sqllite':
+            binder.bind(BaseRepositoryService, SQLLiteRepositoryService())
+        else:
+            raise ValueError(f'Unsupported repository service: {repository_service_config}')
+    except Exception as e:
+        logger.exception(e)
+        raise
