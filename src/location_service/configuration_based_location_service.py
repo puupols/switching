@@ -1,6 +1,7 @@
 from src.location_service.base_location_service import BaseLocationService
 from src.configuration.base_configuration import BaseConfiguration
 
+
 class ConfigurationBasedLocationService(BaseLocationService):
 
     def __init__(self, configuration: BaseConfiguration):
