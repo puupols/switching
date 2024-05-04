@@ -8,6 +8,7 @@ class TestOpenMeteoWeatherAPI(unittest.TestCase):
     def test_get_weather_data(self, mock_requests):
 
         # Setup
+        expected_url = 'https://api.openmeteo.com?latitude=52.555&longitude=24.5555&weather_data_types=cloud_cover,temperature,sunshine_duration&forecast_days=3&timezone=EET'
         data = {"my": "json", "file": "here"}
         response = Mock()
         response.json.return_value = data
@@ -22,7 +23,6 @@ class TestOpenMeteoWeatherAPI(unittest.TestCase):
         result = api_service.get_weather_data(52.555, 24.5555)
 
         # Assertion
-        expected_url = 'https://api.openmeteo.com?latitude=52.555&longitude=24.5555&weather_data_types=cloud_cover,temperature,sunshine_duration&forecast_days=3&timezone=EET'
         mock_requests.get.assert_called_once_with(expected_url)
         response.json.assert_called_once()
         self.assertEqual(result, data)
