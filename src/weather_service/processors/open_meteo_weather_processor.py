@@ -2,7 +2,9 @@ from src.weather_service.processors.base_weather_processor import BaseWeatherPro
 from src.weather_service.models.weather_model import WeatherModel
 from datetime import datetime
 
+
 class OpenMeteoWeatherProcessor(BaseWeatherProcessor):
+    OPEN_METEO_DATE_FORMAT = '%Y-%m-%dT%H:%M'
 
     def process_raw_data(self, raw_data):
         weather_data = []
@@ -11,7 +13,7 @@ class OpenMeteoWeatherProcessor(BaseWeatherProcessor):
 
         for i in range(len(raw_data['hourly']['time'])):
             date_string = raw_data['hourly']['time'][i]
-            date_obj = datetime.strptime(date_string, '%Y-%m-%dT%H:%M')
+            date_obj = datetime.strptime(date_string, self.OPEN_METEO_DATE_FORMAT)
             cloud_cover = raw_data['hourly']['cloud_cover'][i]
             temperature = raw_data['hourly']['temperature'][i]
             sunshine_duration = raw_data['hourly']['sunshine_duration'][i]
@@ -19,4 +21,3 @@ class OpenMeteoWeatherProcessor(BaseWeatherProcessor):
             weather_data.append(weather)
 
         return weather_data
-

@@ -3,6 +3,8 @@ from src.configuration.base_configuration import BaseConfiguration
 
 
 class FileConfiguration(BaseConfiguration):
+    CONFIGURATION_FILE_PATH = 'src/switching.conf'
+
     def __init__(self):
         self.configuration = self._get_configuration_from_file()
 
@@ -10,5 +12,5 @@ class FileConfiguration(BaseConfiguration):
         return self.configuration.get(key)
 
     def _get_configuration_from_file(self):
-        with open('src/switching.conf', 'r') as config_file:
+        with open(self.CONFIGURATION_FILE_PATH, 'r') as config_file:
             return json.loads(config_file.read())

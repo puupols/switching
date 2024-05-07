@@ -8,18 +8,18 @@ import logging
 
 
 class SQLLiteRepositoryService(BaseRepositoryService):
+    DB_PATH = 'src/repository_service/sql_lite_db/switching.db'
+    BASE_SQL_PATH = 'src/repository_service/sql_lite_db/sql/'
 
     def __init__(self):
         super().__init__()
-        self.db_path = 'src/repository_service/sql_lite_db/switching.db'
-        self.base_sql_path = 'src/repository_service/sql_lite_db/sql/'
         self.initialize_database()
         self.logger = logging.getLogger(__name__)
 
     def initialize_database(self):
-        connection = sqlite3.connect(self.db_path)
+        connection = sqlite3.connect(self.DB_PATH)
         cursor = connection.cursor()
-        init_query = self._load_sql_query(self.base_sql_path + 'initialize/initialize_database.sql')
+        init_query = self._load_sql_query(self.BASE_SQL_PATH + 'initialize/initialize_database.sql')
         cursor.executescript(init_query)
         connection.commit()
         connection.close()
@@ -30,7 +30,7 @@ class SQLLiteRepositoryService(BaseRepositoryService):
 
     @contextmanager
     def db_connection(self):
-        connection = sqlite3.connect(self.db_path)
+        connection = sqlite3.connect(self.DB_PATH)
         cursor = connection.cursor()
         cursor.row_factory = sqlite3.Row
         try:
@@ -42,8 +42,8 @@ class SQLLiteRepositoryService(BaseRepositoryService):
             connection.close()
 
     def store_weather_data(self, weather_data: List[WeatherModel]):
-        insert_statement = self._load_sql_query(self.base_sql_path + 'weather/insert_weather.sql')
-        update_statement = self._load_sql_query(self.base_sql_path + 'weather/update_weather.sql')
+        insert_statement = self._load_sql_query(self.BASE_SQL_PATH + 'weather/insert_weather.sql')
+        update_statement = self._load_sql_query(self.BASE_SQL_PATH + 'weather/update_weather.sql')
 
         def get_params(weather):
             return {'datetime': weather.datetime, 'cloud_cover': weather.cloud_cover,
@@ -59,9 +59,9 @@ class SQLLiteRepositoryService(BaseRepositoryService):
     def store_electricity_price_data(self, electricity_prices: List[ElectricityPriceModel]):
 
         insert_statement = self._load_sql_query(
-            self.base_sql_path + 'electricity_price/insert_electricity_price.sql')
+            self.BASE_SQL_PATH + 'electricity_price/insert_electricity_price.sql')
         update_statement = self._load_sql_query(
-            self.base_sql_path + 'electricity_price/update_electricity_price.sql')
+            self.BASE_SQL_PATH + 'electricity_price/update_electricity_price.sql')
 
         def get_params(electricity_price):
             return {
@@ -77,7 +77,7 @@ class SQLLiteRepositoryService(BaseRepositoryService):
 
     def get_weather_data_after_date(self, date):
         select_statement = self._load_sql_query(
-            self.base_sql_path + 'weather/get_weather_data_after_date.sql')
+            self.BASE_SQL_PATH + 'weather/get_weather_data_after_date.sql')
 
         params = {'datetime': date}
 
@@ -89,7 +89,7 @@ class SQLLiteRepositoryService(BaseRepositoryService):
 
     def get_electricity_price_data_after_date(self, date):
         select_statement = self._load_sql_query(
-            self.base_sql_path + 'electricity_price/get_electricity_price_after_date.sql')
+            self.BASE_SQL_PATH + 'electricity_price/get_electricity_price_after_date.sql')
 
         params = {'datetime': date}
 

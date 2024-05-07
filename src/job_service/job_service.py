@@ -6,6 +6,8 @@ from src.configuration.base_configuration import BaseConfiguration
 
 
 class JobService:
+    WEATHER_DATA_REGENERATION_JOB_INTERVAL_IN_MINUTES_CONFIG_NAME = 'weather_data_regeneration_job_interval_in_minutes'
+    ELECTRICITY_PRICE_DATA_REGENERATION_JOB_INTERVAL_IN_MINUTES_CONFIG_NAME = 'electricity_price_data_regeneration_job_interval_in_minutes'
 
     @inject.autoparams()
     def __init__(self, weather_service: WeatherService,
@@ -17,12 +19,12 @@ class JobService:
         self.scheduler = BackgroundScheduler()
 
     def _plan_weather_data_regeneration_job(self):
-        interval_in_minutes = self.configuration.get('weather_data_regeneration_job_interval_in_minutes')
+        interval_in_minutes = self.configuration.get(self.WEATHER_DATA_REGENERATION_JOB_INTERVAL_IN_MINUTES_CONFIG_NAME)
         self.scheduler.add_job(self.weather_service.regenerate_weather_data,
                                'interval', minutes=interval_in_minutes)
 
     def _plan_electricity_price_data_regeneration_job(self):
-        interval_in_minutes = self.configuration.get('electricity_price_data_regeneration_job_interval_in_minutes')
+        interval_in_minutes = self.configuration.get(self.ELECTRICITY_PRICE_DATA_REGENERATION_JOB_INTERVAL_IN_MINUTES_CONFIG_NAME)
         self.scheduler.add_job(self.electricity_price_service.regenerate_electricity_price_data,
                                'interval', minutes=interval_in_minutes)
 

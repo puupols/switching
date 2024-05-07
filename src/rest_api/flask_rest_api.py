@@ -6,6 +6,8 @@ from flask_httpauth import HTTPBasicAuth
 
 
 class FlaskRESTAPI:
+    REST_USERNAME_CONFIG_NAME = 'rest_username'
+    REST_PASSWORD_CONFIG_NAME = 'rest_password'
 
     @inject.autoparams()
     def __init__(self, switch_service: SwitchService, configuration: BaseConfiguration):
@@ -14,15 +16,13 @@ class FlaskRESTAPI:
         self.app = Flask('__name__')
         self.auth = HTTPBasicAuth()
         self.setup_routes()
-        self.username = configuration.get('rest_username')
-        self.password = configuration.get('rest_password')
-
+        self.username = configuration.get(self.REST_USERNAME_CONFIG_NAME)
+        self.password = configuration.get(self.REST_PASSWORD_CONFIG_NAME)
 
     def run_app(self):
         self.app.run(debug=False)
 
     def setup_routes(self):
-
         @self.auth.verify_password
         def verify_password(username, password):
             if username == self.username and password == self.password:
