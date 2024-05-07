@@ -1,0 +1,6 @@
+Flask
+Flask-Testing
+Flask-HTTPAuth
+APScheduler
+Requests
+inject
