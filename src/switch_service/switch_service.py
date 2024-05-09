@@ -8,6 +8,19 @@ import logging
 
 
 class SwitchService:
+    """
+    Service class responsible for managing switch statuses based on dynamic loading of switch status modules.
+
+    This service dynamically loads Python modules corresponding to specific switch names to determine their status.
+    It uses configuration settings to restrict the allowed switch names and handles interactions with both the weather
+    and electricity price services to provide necessary data for switch status determination.
+
+    Attributes:
+        configuration (BaseConfiguration): Configuration object providing access to necessary settings like allowed switch names.
+        weather_service (WeatherService): Service providing weather data.
+        electricity_price_service (ElectricityPriceService): Service providing electricity price data.
+        logger (logging.Logger): Logger for recording activity and errors within the service.
+    """
     SWITCH_STATUS_FILE_BASE_PATH = 'src/switch_service/switch_statuses/'
     SWITCH_STATUS_FILE_EXTENSION = '.py'
     ALLOWED_SWITCH_NAME_CONFIG_NAME = 'allowed_switch_names'
@@ -17,12 +30,35 @@ class SwitchService:
     def __init__(self, configuration: BaseConfiguration,
                  weather_service: WeatherService,
                  electricity_price_service: ElectricityPriceService):
+        """
+        Initializes the SwitchService with configuration and necessary services.
+
+        Args:
+            configuration (BaseConfiguration): Configuration object for retrieving service settings.
+            weather_service (WeatherService): The service that provides weather data.
+            electricity_price_service (ElectricityPriceService): The service that provides electricity price data.
+        """
         self.configuration = configuration
         self.weather_service = weather_service
         self.electricity_price_service = electricity_price_service
         self.logger = logging.getLogger(__name__)
 
     def _load_module(self, switch_name):
+        """
+        Dynamically loads a Python module corresponding to the given switch name.
+
+        Checks if the switch name is allowed based on the configuration. If allowed, the corresponding Python
+        file is loaded as a module to determine the switch status.
+
+        Args:
+            switch_name (str): The name of the switch for which the status module is to be loaded.
+
+        Returns:
+            module: The loaded Python module corresponding to the switch, or None if an error occurs.
+
+        Raises:
+            ValueError: If the switch name is not allowed based on configuration settings.
+        """
         allowed_switch_names = self.configuration.get(self.ALLOWED_SWITCH_NAME_CONFIG_NAME)
         if switch_name not in allowed_switch_names:
             self.logger.exception('Switch name must be defined in configuration')
@@ -44,6 +80,15 @@ class SwitchService:
         return None
 
     def get_switch_status(self, switch_name):
+        """
+        Retrieves the status of a switch by dynamically loading its status module and executing its status determination logic defined in the module.
+
+        Args:
+            switch_name (str): The name of the switch whose status is to be determined.
+
+        Returns:
+            str: The status of the switch, or 'ERROR' if an error occurs during the process.
+        """
         try:
             module = self._load_module(switch_name)
             return module.get_switch_status(self.weather_service, self.electricity_price_service)

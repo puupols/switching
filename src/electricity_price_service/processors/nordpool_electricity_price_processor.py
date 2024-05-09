@@ -4,9 +4,31 @@ from src.electricity_price_service.models.electricity_price_model import Electri
 
 
 class NordpoolElectricityPriceProcessor(BaseElectricityPriceProcessor):
+    """
+    A concrete processor class that implements BaseElectricityPriceProcessor for handling
+    electricity price data from the Nordpool market.
+
+    Attributes:
+        NORDPOOL_DATE_FORMAT (str): The datetime format used to parse the date strings from Nordpool data.
+
+    Methods:
+        process_data: Implements the data processing to parse Nordpool specific raw data into a list of ElectricityPriceModel instances.
+    """
     NORDPOOL_DATE_FORMAT = '%d-%m-%YT%H'
 
     def process_data(self, raw_data):
+        """
+         Processes raw electricity price data from the Nordpool market into structured ElectricityPriceModel instances.
+
+         Iterates over each hour's data provided in the raw_data, extracts, and converts the date and price
+         information into ElectricityPriceModel instances.
+
+         Args:
+             raw_data (dict): The raw data fetched from Nordpool containing date and price information in a specific structure.
+
+         Returns:
+             list[ElectricityPriceModel]: A list of ElectricityPriceModel instances representing hourly electricity prices.
+         """
         electricity_prices = []
         for i in range(24):
             raw_time = raw_data['data']['Rows'][i]['Name']
