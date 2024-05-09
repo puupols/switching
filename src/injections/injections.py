@@ -16,6 +16,19 @@ from src.repository_service.sqllite_repository_service import SQLLiteRepositoryS
 
 
 def app_injection_configuration(binder):
+    """
+    Configures and binds services to their respective interfaces based on application settings defined in configuration files.
+
+    This function dynamically configures dependency injections based on the specific service implementations
+    specified in the configuration file. It establishes mappings between interface types and their concrete implementations,
+    ensuring that components throughout the application can rely on consistent and configurable dependency injection.
+
+    Args:
+        binder (inject.Binder): The binder provided by the 'inject' library for configuring dependencies.
+
+    Raises:
+        ValueError: If the configuration specifies an unsupported service.
+    """
 
     logger = logging.getLogger(__name__)
     try:

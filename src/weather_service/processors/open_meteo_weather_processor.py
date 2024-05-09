@@ -4,9 +4,31 @@ from datetime import datetime
 
 
 class OpenMeteoWeatherProcessor(BaseWeatherProcessor):
+    """
+    Concrete implementation of BaseWeatherProcessor for processing weather data from Open Meteo.
+
+    This processor transforms raw weather data fetched from the Open Meteo API into structured WeatherModel instances.
+    Each model instance represents weather data for a specific time point including details like temperature,
+    cloud cover, and sunshine duration at specified geographic coordinates.
+
+    Attributes:
+        OPEN_METEO_DATE_FORMAT (str): The date and time format used by the Open Meteo API.
+    """
     OPEN_METEO_DATE_FORMAT = '%Y-%m-%dT%H:%M'
 
     def process_raw_data(self, raw_data):
+        """
+        Processes raw weather data from Open Meteo into WeatherModel instances.
+
+        Parses the raw JSON data from Open Meteo, extracting relevant weather parameters
+        and converting them into a list of WeatherModel instances.
+
+        Args:
+            raw_data (dict): The raw JSON data received from the Open Meteo API.
+
+        Returns:
+            list[WeatherModel]: A list of WeatherModel instances representing the processed weather data.
+        """
         weather_data = []
         latitude = raw_data['latitude']
         longitude = raw_data['longitude']
