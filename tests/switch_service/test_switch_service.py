@@ -9,8 +9,10 @@ class TestSwitchService(unittest.TestCase):
         self.mock_config = Mock()
         self.mock_weather_service = Mock()
         self.mock_electricity_price_service = Mock()
-        self.switch_service = SwitchService(self.mock_config, self.mock_weather_service,
-                                            self.mock_electricity_price_service)
+        self.mock_logger = Mock()
+        with patch('src.switch_service.switch_service.logging.getLogger', return_value=self.mock_logger):
+            self.switch_service = SwitchService(self.mock_config, self.mock_weather_service,
+                                                self.mock_electricity_price_service)
 
     @patch('src.switch_service.switch_service.importlib.util')
     @patch('src.switch_service.switch_service.sys')
