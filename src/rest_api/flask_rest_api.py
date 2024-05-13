@@ -1,3 +1,4 @@
+import logging
 from src.switch_service.switch_service import SwitchService
 from src.configuration.base_configuration import BaseConfiguration
 import inject
@@ -40,6 +41,7 @@ class FlaskRESTAPI:
         self.setup_routes()
         self.username = configuration.get(self.REST_USERNAME_CONFIG_NAME)
         self.password = configuration.get(self.REST_PASSWORD_CONFIG_NAME)
+        self.logger = logging.getLogger(__name__)
 
     def run_app(self):
         """
@@ -82,4 +84,7 @@ class FlaskRESTAPI:
                 str: The current status of the switch.
             """
             switch_name = request.args.get('name')
-            return self.switch_service.get_switch_status(switch_name)
+            self.logger.info(f'Received /status request with switch name: {switch_name}')
+            response = self.switch_service.get_switch_status(switch_name)
+            self.logger.info(f'Returned response: {response}')
+            return response
