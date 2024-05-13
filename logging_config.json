@@ -1,0 +1,45 @@
+{
+    "version": 1,
+    "disable_existing_loggers": false,
+    "formatters": {
+        "standard": {
+            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S"
+        }
+    },
+    "handlers": {
+        "fileHandler": {
+            "class": "logging.FileHandler",
+            "level": "DEBUG",
+            "formatter": "standard",
+            "filename": "application.log",
+            "mode": "a",
+            "encoding": "utf-8"
+        },
+        "consoleHandler": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+            "formatter": "standard"
+        },
+        "RESTHandler": {
+            "class": "logging.FileHandler",
+            "level": "DEBUG",
+            "formatter": "standard",
+            "filename": "rest.log",
+            "mode": "a",
+            "encoding": "utf-8"
+        }
+    },
+    "loggers": {
+         "root": {
+            "level": "INFO",
+            "handlers": ["fileHandler", "consoleHandler"],
+            "propagate": false
+        },
+        "src.rest_api": {
+            "level": "INFO",
+            "handlers": ["RESTHandler"],
+            "propagate": false
+        }
+    }
+}
