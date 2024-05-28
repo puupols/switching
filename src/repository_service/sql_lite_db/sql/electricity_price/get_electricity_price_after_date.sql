@@ -1,1 +1,0 @@
-SELECT datetime, price FROM electricity_price WHERE datetime > :datetime

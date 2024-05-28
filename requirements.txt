@@ -1,6 +1,7 @@
 Flask
 Flask-Testing
 Flask-HTTPAuth
+SQLAlchemy
 APScheduler
 Requests
 inject

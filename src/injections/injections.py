@@ -11,8 +11,6 @@ from src.weather_service.processors.open_meteo_weather_processor import OpenMete
 from src.location_service.base_location_service import BaseLocationService
 from src.location_service.configuration_based_location_service import ConfigurationBasedLocationService
 from src.weather_service.api.open_meteo_weather_api import OpenMeteoWeatherAPI
-from src.repository_service.base_repository_service import BaseRepositoryService
-from src.repository_service.sqllite_repository_service import SQLLiteRepositoryService
 
 
 def app_injection_configuration(binder):
@@ -55,12 +53,6 @@ def app_injection_configuration(binder):
             binder.bind(BaseElectricityPriceProcessor, NordpoolElectricityPriceProcessor())
         else:
             raise ValueError(f'Unsupported electricity price api service: {electricity_price_api_config}')
-
-        repository_service_config = configuration_instance.get('repository_service')
-        if repository_service_config == 'sqllite':
-            binder.bind(BaseRepositoryService, SQLLiteRepositoryService())
-        else:
-            raise ValueError(f'Unsupported repository service: {repository_service_config}')
     except Exception as e:
         logger.exception(e)
         raise

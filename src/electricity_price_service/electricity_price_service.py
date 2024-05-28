@@ -1,7 +1,7 @@
 import inject
 from src.electricity_price_service.api.base_electricity_price_api import BaseElectricityPriceAPI
 from src.electricity_price_service.processors.base_electricity_price_processor import BaseElectricityPriceProcessor
-from src.repository_service.base_repository_service import BaseRepositoryService
+from src.repository_service.repository_service import RepositoryService
 
 class ElectricityPriceService:
     """
@@ -13,12 +13,12 @@ class ElectricityPriceService:
     Attributes:
         electricity_price_api (BaseElectricityPriceAPI): An API client for fetching electricity price data.
         electricity_price_processor (BaseElectricityPriceProcessor): A processor to transform raw data into a usable format.
-        repository_service (BaseRepositoryService): A repository service for storing and retrieving processed data.
+        repository_service (RepositoryService): A repository service for storing and retrieving processed data.
     """
 
     @inject.autoparams()
     def __init__(self, electricity_price_api: BaseElectricityPriceAPI, electricity_price_processor: BaseElectricityPriceProcessor,
-                 repository_service: BaseRepositoryService):
+                 repository_service: RepositoryService):
         """
         Initializes the ElectricityPriceService with the necessary components.
 

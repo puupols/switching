@@ -1,3 +1,5 @@
+from datetime import datetime
+
 
 class WeatherModel:
     """
@@ -15,6 +17,13 @@ class WeatherModel:
         longitude (float): The longitude of the location for which the weather data is applicable.
         sunshine_duration (float): The duration of sunshine in hours for the day on which this data point applies.
     """
+    datetime: datetime
+    cloud_cover: float
+    temperature: float
+    latitude: float
+    longitude: float
+    sunshine_duration: float
+
     def __init__(self, datetime, cloud_cover, temperature, latitude, longitude, sunshine_duration):
         self.datetime = datetime
         self.cloud_cover = cloud_cover
