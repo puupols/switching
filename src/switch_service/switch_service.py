@@ -59,7 +59,7 @@ class SwitchService:
         Raises:
             ValueError: If the switch name is not allowed based on configuration settings.
         """
-        allowed_switch_names = self.configuration.get(self.ALLOWED_SWITCH_NAME_CONFIG_NAME)
+        allowed_switch_names = self.configuration.get_as_list(self.ALLOWED_SWITCH_NAME_CONFIG_NAME)
         if switch_name not in allowed_switch_names:
             self.logger.exception('Switch name must be defined in configuration')
             raise ValueError('Switch name must be defined in configuration')

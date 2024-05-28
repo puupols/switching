@@ -8,7 +8,7 @@ class BaseConfiguration(ABC):
     Defines the interface for configuration handling that any subclass should implement.
     """
     @abstractmethod
-    def get(self, key):
+    def get(self, key, default=None):
         """
         Abstract method to retrieve a configuration value by key.
 
@@ -20,4 +20,8 @@ class BaseConfiguration(ABC):
         Returns:
             The value associated with the given key. The return type can vary depending on the implementation.
         """
+        pass
+
+    @abstractmethod
+    def get_as_list(self, key, default=None):
         pass

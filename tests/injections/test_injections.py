@@ -10,7 +10,7 @@ from src.weather_service.processors.base_weather_processor import BaseWeatherPro
 
 
 class TestAppInjectionConfiguration(unittest.TestCase):
-    @patch('src.injections.injections.FileConfiguration', autospec=True)
+    @patch('src.injections.injections.EnvironmentVariableConfiguration', autospec=True)
     @patch('src.injections.injections.ConfigurationBasedLocationService', autospec=True)
     @patch('src.injections.injections.OpenMeteoWeatherAPI', autospec=True)
     @patch('src.injections.injections.OpenMeteoWeatherProcessor', autospec=True)
@@ -19,10 +19,10 @@ class TestAppInjectionConfiguration(unittest.TestCase):
     @patch('src.injections.injections.logging.getLogger')
     def test_app_injection_configuration(self, mock_logger, mock_nordpool_processor,
                                          mock_nordpool_api, mock_weather_processor, mock_weather_api,
-                                         mock_location_service, mock_file_config):
+                                         mock_location_service, mock_config):
         # Setup mock configuration to return specific values
         mock_config_instance = MagicMock()
-        mock_file_config.return_value = mock_config_instance
+        mock_config.return_value = mock_config_instance
         mock_config_instance.get.side_effect = lambda key: {
             'location_service': 'configuration_file',
             'weather_service': 'open_meteo',
@@ -45,7 +45,7 @@ class TestAppInjectionConfiguration(unittest.TestCase):
 
         mock_binder.bind.assert_has_calls(expected_calls, any_order=True)
 
-    @patch('src.injections.injections.FileConfiguration', autospec=True)
+    @patch('src.injections.injections.EnvironmentVariableConfiguration', autospec=True)
     @patch('src.injections.injections.ConfigurationBasedLocationService', autospec=True)
     @patch('src.injections.injections.OpenMeteoWeatherAPI', autospec=True)
     @patch('src.injections.injections.OpenMeteoWeatherProcessor', autospec=True)
@@ -54,10 +54,10 @@ class TestAppInjectionConfiguration(unittest.TestCase):
     @patch('src.injections.injections.logging.getLogger')
     def test_invalid_location_service_config(self, mock_logger, mock_nordpool_processor,
                                              mock_nordpool_api, mock_weather_processor, mock_weather_api,
-                                             mock_location_service, mock_file_config):
+                                             mock_location_service, mock_config):
         # Setup mock configuration to return an invalid value for location service
         mock_config_instance = MagicMock()
-        mock_file_config.return_value = mock_config_instance
+        mock_config.return_value = mock_config_instance
         mock_config_instance.get.side_effect = lambda key: {
             'location_service': 'invalid_config',
             'weather_service': 'open_meteo',
@@ -72,7 +72,7 @@ class TestAppInjectionConfiguration(unittest.TestCase):
             app_injection_configuration(mock_binder)
         self.assertIn("Unsupported location service", str(context.exception))
 
-    @patch('src.injections.injections.FileConfiguration', autospec=True)
+    @patch('src.injections.injections.EnvironmentVariableConfiguration', autospec=True)
     @patch('src.injections.injections.ConfigurationBasedLocationService', autospec=True)
     @patch('src.injections.injections.OpenMeteoWeatherAPI', autospec=True)
     @patch('src.injections.injections.OpenMeteoWeatherProcessor', autospec=True)
@@ -81,10 +81,10 @@ class TestAppInjectionConfiguration(unittest.TestCase):
     @patch('src.injections.injections.logging.getLogger')
     def test_invalid_weather_service_config(self, mock_logger, mock_nordpool_processor,
                                             mock_nordpool_api, mock_weather_processor, mock_weather_api,
-                                            mock_location_service, mock_file_config):
+                                            mock_location_service, mock_config):
         # Setup mock configuration to return an invalid value for location service
         mock_config_instance = MagicMock()
-        mock_file_config.return_value = mock_config_instance
+        mock_config.return_value = mock_config_instance
         mock_config_instance.get.side_effect = lambda key: {
             'location_service': 'configuration_file',
             'weather_service': 'invalid_config',
@@ -99,7 +99,7 @@ class TestAppInjectionConfiguration(unittest.TestCase):
             app_injection_configuration(mock_binder)
         self.assertIn("Unsupported weather api service", str(context.exception))
 
-    @patch('src.injections.injections.FileConfiguration', autospec=True)
+    @patch('src.injections.injections.EnvironmentVariableConfiguration', autospec=True)
     @patch('src.injections.injections.ConfigurationBasedLocationService', autospec=True)
     @patch('src.injections.injections.OpenMeteoWeatherAPI', autospec=True)
     @patch('src.injections.injections.OpenMeteoWeatherProcessor', autospec=True)
@@ -108,10 +108,10 @@ class TestAppInjectionConfiguration(unittest.TestCase):
     @patch('src.injections.injections.logging.getLogger')
     def test_invalid_electricity_price_service_config(self, mock_logger, mock_nordpool_processor,
                                                       mock_nordpool_api, mock_weather_processor, mock_weather_api,
-                                                      mock_location_service, mock_file_config):
+                                                      mock_location_service, mock_config):
         # Setup mock configuration to return an invalid value for location service
         mock_config_instance = MagicMock()
-        mock_file_config.return_value = mock_config_instance
+        mock_config.return_value = mock_config_instance
         mock_config_instance.get.side_effect = lambda key: {
             'location_service': 'configuration_file',
             'weather_service': 'open_meteo',

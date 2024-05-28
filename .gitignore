@@ -1,3 +1,4 @@
 switching.db
 application.log
 rest.log
+.env

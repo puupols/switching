@@ -44,7 +44,7 @@ class JobService:
         """
         Plans and schedules the job to regenerate weather data at intervals specified in the configuration.
         """
-        interval_in_minutes = self.configuration.get(self.WEATHER_DATA_REGENERATION_JOB_INTERVAL_IN_MINUTES_CONFIG_NAME)
+        interval_in_minutes = int(self.configuration.get(self.WEATHER_DATA_REGENERATION_JOB_INTERVAL_IN_MINUTES_CONFIG_NAME))
         self.scheduler.add_job(self.weather_service.regenerate_weather_data,
                                'interval', minutes=interval_in_minutes)
 
@@ -52,7 +52,7 @@ class JobService:
         """
         Plans and schedules the job to regenerate electricity price data at intervals specified in the configuration.
         """
-        interval_in_minutes = self.configuration.get(self.ELECTRICITY_PRICE_DATA_REGENERATION_JOB_INTERVAL_IN_MINUTES_CONFIG_NAME)
+        interval_in_minutes = int(self.configuration.get(self.ELECTRICITY_PRICE_DATA_REGENERATION_JOB_INTERVAL_IN_MINUTES_CONFIG_NAME))
         self.scheduler.add_job(self.electricity_price_service.regenerate_electricity_price_data,
                                'interval', minutes=interval_in_minutes)
 
