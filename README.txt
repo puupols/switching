@@ -8,7 +8,6 @@ Adding new switches is straightforward: simply create a new file in the switch_s
 ## Structure:
 - `src/`: Main source code including application logic and services.
   - `app.py`: Entry point of the application.
-  - `switching.conf`: Configuration settings for the application.
   - `electricity_price_service/`: Services for fetching and processing electricity prices.
   - `weather_service/`: Services for fetching and processing weather forecast.
   - `repository_service/`: Services for storing the data.
@@ -17,11 +16,12 @@ Adding new switches is straightforward: simply create a new file in the switch_s
   - `job_service/`: Services for planning the background jobs to fetch weather and electricity price data
   - `rest_api/`: REST API service to interface with external systems or switches.
 - `tests/`: Contains unit tests for the application modules.
+- `.env`: Environment variable configuration settings for the application.
 
 ## Installation:
 1. Ensure Python 3.8 or newer is installed.
 2. Install dependencies: `pip install -r requirements.txt`
-3. No specific environment variables are used.
+3. Check and configure environment variables from the .env.example file
 
 ## Usage:
 Run the application by running the following script:

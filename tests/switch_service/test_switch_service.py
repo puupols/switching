@@ -25,7 +25,7 @@ class TestSwitchService(unittest.TestCase):
         mock_spec.loader.exec_module.return_value = None
 
         # Actions
-        self.mock_config.get.return_value = ['valid_switch']
+        self.mock_config.get_as_list.return_value = ['valid_switch']
         result = self.switch_service._load_module('valid_switch')
 
         # Asserts
@@ -34,7 +34,7 @@ class TestSwitchService(unittest.TestCase):
 
     @patch('src.switch_service.switch_service.importlib.util')
     def test_load_module_invalid_switch_name(self, mock_importlib):
-        self.mock_config.get.return_value = ['valid_switch']
+        self.mock_config.get_as_list.return_value = ['valid_switch']
         with self.assertRaises(ValueError):
             self.switch_service._load_module('invalid_switch')
 

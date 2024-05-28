@@ -5,3 +5,4 @@ SQLAlchemy
 APScheduler
 Requests
 inject
+python-dotenv

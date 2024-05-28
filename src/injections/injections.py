@@ -1,6 +1,6 @@
 import logging
 from src.configuration.base_configuration import BaseConfiguration
-from src.configuration.file_configuration import FileConfiguration
+from src.configuration.environment_variable_configuration import EnvironmentVariableConfiguration
 from src.electricity_price_service.api.base_electricity_price_api import BaseElectricityPriceAPI
 from src.electricity_price_service.api.nordpool_electricity_price_api import NordpoolElectricityPriceAPI
 from src.electricity_price_service.processors.base_electricity_price_processor import BaseElectricityPriceProcessor
@@ -31,7 +31,7 @@ def app_injection_configuration(binder):
     logger = logging.getLogger(__name__)
     try:
         # Bind configuration instance
-        configuration_instance = FileConfiguration()
+        configuration_instance = EnvironmentVariableConfiguration()
         binder.bind(BaseConfiguration, configuration_instance)
 
         location_service_config = configuration_instance.get('location_service')
