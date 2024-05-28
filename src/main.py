@@ -2,6 +2,7 @@
 import inject
 from src.job_service.job_service import JobService
 from src.rest_api.flask_rest_api import FlaskRESTAPI
+from src.repository_service.repository_service import RepositoryService
 
 
 class Main:
@@ -17,7 +18,7 @@ class Main:
     """
 
     @inject.autoparams()
-    def __init__(self, job_service: JobService, rest_api: FlaskRESTAPI):
+    def __init__(self, job_service: JobService, rest_api: FlaskRESTAPI, repository_service: RepositoryService):
         """
         Initializes the Main class with a job service and REST API service.
 
@@ -27,6 +28,7 @@ class Main:
         """
         self.job_service = job_service
         self.rest_api = rest_api
+        self.repository_service = repository_service
 
     def run(self):
         """
@@ -35,6 +37,7 @@ class Main:
         This method orchestrates the startup of the job service to begin executing scheduled jobs
         and launches the REST API to handle incoming HTTP requests.
         """
+        self.repository_service.create_database()
         self.job_service.plan_jobs()
         self.rest_api.run_app()
 

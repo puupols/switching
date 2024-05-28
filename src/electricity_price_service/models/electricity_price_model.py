@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 class ElectricityPriceModel:
     """
     A model class to represent electricity price data at a specific datetime.
@@ -9,6 +12,8 @@ class ElectricityPriceModel:
     Methods:
         None: This model class is primarily used for storing and accessing electricity price data.
     """
+    datetime: datetime
+    price: float
 
     def __init__(self, datetime, price):
         """

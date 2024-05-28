@@ -1,1 +1,0 @@
-UPDATE electricity_price SET price = :price WHERE datetime = :datetime
