@@ -1,90 +1,74 @@
-import logging
-from src.switch_service.switch_service import SwitchService
-from src.configuration.base_configuration import BaseConfiguration
 import inject
-from flask import Flask, request
-from flask_httpauth import HTTPBasicAuth
+
+from src.configuration.base_configuration import BaseConfiguration
+from flask import Flask
+from flask_smorest import Api
+from .resources.switch import blp as SwitchBlueprint
+from .resources.user import blp as UserBlueprint
+from flask_jwt_extended import JWTManager
 
 
 class FlaskRESTAPI:
     """
-    A Flask-based REST API class for managing switch services with HTTP basic authentication.
-
-    This class creates a Flask application that exposes REST endpoints to control and monitor
-    switch statuses through an authenticated interface. The API uses basic authentication and
-    integrates a switch service for actual switch status handling.
+     A class to create and run a Flask-based REST API.
 
     Attributes:
-        switch_service (SwitchService): The service responsible for managing switches.
-        configuration (BaseConfiguration): Configuration service for accessing API credentials.
-        app (Flask): The Flask application object that handles API requests.
-        auth (HTTPBasicAuth): HTTP basic authentication handler.
+        REST_USERNAME_CONFIG_NAME (str): Configuration name for REST username.
+        REST_PASSWORD_CONFIG_NAME (str): Configuration name for REST password.
     """
+
     REST_USERNAME_CONFIG_NAME = 'rest_username'
     REST_PASSWORD_CONFIG_NAME = 'rest_password'
+    PROPAGATE_EXCEPTIONS = True
+    API_TITLE = "Switching REST API"
+    API_VERSION = "V1"
+    OPENAPI_VERSION = "3.0.3"
+    OPENAPI_URL_PREFIX = "/"
+    OPENAPI_SWAGGER_UI_PATH = "/swagger-ui"
+    OPENAPI_SWAGGER_UI_URL = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
 
     @inject.autoparams()
-    def __init__(self, switch_service: SwitchService, configuration: BaseConfiguration):
+    def __init__(self, configuration: BaseConfiguration):
         """
-        Initializes the FlaskRESTAPI with necessary services and configurations.
+        Initializes the FlaskRESTAPI instance.
 
         Args:
-            switch_service (SwitchService): The service responsible for switch operations.
-            configuration (BaseConfiguration): Configuration object to retrieve API credentials.
-
-        Sets up the Flask application and routes, and configures basic authentication.
+            configuration (BaseConfiguration): The configuration object to initialize the API.
         """
-        self.switch_service = switch_service
         self.configuration = configuration
-        self.app = Flask('__name__')
-        self.auth = HTTPBasicAuth()
-        self.setup_routes()
-        self.username = configuration.get(self.REST_USERNAME_CONFIG_NAME)
-        self.password = configuration.get(self.REST_PASSWORD_CONFIG_NAME)
-        self.logger = logging.getLogger(__name__)
+        self.app = self.create_app()
 
     def run_app(self):
         """
-        Starts the Flask application.
-
-        Runs the Flask app in production mode with debug features turned off.
+        Runs the Flask application with debug mode disabled.
         """
         self.app.run(debug=False)
 
-    def setup_routes(self):
+    def create_app(self):
         """
-        Sets up the routes for the Flask application with authentication.
+        Creates and configures the Flask application.
 
-        Defines the routes and their corresponding authentication and handlers within the Flask application.
+        Configures the Flask app with the necessary settings, registers blueprints,
+        and initializes JWTManager.
+
+        Returns:
+            Flask: The configured Flask application instance.
         """
-        @self.auth.verify_password
-        def verify_password(username, password):
-            """
-            Verifies the provided username and password against configured values.
+        app = Flask(__name__)
+        app.config["PROPAGATE_EXCEPTIONS"] = self.PROPAGATE_EXCEPTIONS
+        app.config["API_TITLE"] = self.API_TITLE
+        app.config["API_VERSION"] = self.API_VERSION
+        app.config["OPENAPI_VERSION"] = self.OPENAPI_VERSION
+        app.config["OPENAPI_URL_PREFIX"] = self.OPENAPI_URL_PREFIX
+        app.config["OPENAPI_SWAGGER_UI_PATH"] = self.OPENAPI_SWAGGER_UI_PATH
+        app.config["OPENAPI_SWAGGER_UI_URL"] = self.OPENAPI_SWAGGER_UI_URL
 
-            Args:
-                username (str): The username provided by the client.
-                password (str): The password provided by the client.
+        api = Api(app)
+        api.register_blueprint(SwitchBlueprint)
+        api.register_blueprint(UserBlueprint)
 
-            Returns:
-                str: The username if authentication is successful, None otherwise.
-            """
-            if username == self.username and password == self.password:
-                return username
+        app.config["JWT_SECRET_KEY"] = self.configuration.get("JWT_SECRET_KEY")
+        jwt = JWTManager(app)
 
-        @self.app.route('/status')
-        @self.auth.login_required
-        def get_switch_status():
-            """
-            Endpoint to get the status of a switch.
+        return app
 
-            Retrieves the status of a switch specified by the 'name' query parameter in the request.
-
-            Returns:
-                str: The current status of the switch.
-            """
-            switch_name = request.args.get('name')
-            self.logger.info(f'Received /status request with switch name: {switch_name}')
-            response = self.switch_service.get_switch_status(switch_name)
-            self.logger.info(f'Returned response: {response}')
-            return response

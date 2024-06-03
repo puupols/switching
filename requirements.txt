@@ -6,3 +6,6 @@ APScheduler
 Requests
 inject
 python-dotenv
+marshmallow
+flask_smorest
+flask-jwt-extended
