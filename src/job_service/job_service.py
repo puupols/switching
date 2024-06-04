@@ -1,5 +1,5 @@
 import inject
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.blocking import BlockingScheduler
 from src.electricity_price_service.electricity_price_service import ElectricityPriceService
 from src.weather_service.weather_service import WeatherService
 from src.configuration.base_configuration import BaseConfiguration
@@ -9,14 +9,14 @@ class JobService:
     """
     Service class to manage and schedule periodic data regeneration jobs for weather and electricity price data.
 
-    This class uses the APScheduler's BackgroundScheduler to schedule and run jobs that periodically
+    This class uses the APScheduler's BlockingScheduler to schedule and run jobs that periodically
     invoke data regeneration methods in the weather and electricity price services.
 
     Attributes:
         weather_service (WeatherService): Service responsible for managing weather data operations.
         electricity_price_service (ElectricityPriceService): Service responsible for managing electricity price data operations.
         configuration (BaseConfiguration): Configuration instance to fetch job scheduling parameters.
-        scheduler (BackgroundScheduler): APScheduler's scheduler to manage background jobs.
+        scheduler (BlockingScheduler): APScheduler's scheduler to manage jobs.
     """
     WEATHER_DATA_REGENERATION_JOB_INTERVAL_IN_MINUTES_CONFIG_NAME = 'weather_data_regeneration_job_interval_in_minutes'
     ELECTRICITY_PRICE_DATA_REGENERATION_JOB_INTERVAL_IN_MINUTES_CONFIG_NAME = 'electricity_price_data_regeneration_job_interval_in_minutes'
@@ -38,7 +38,7 @@ class JobService:
         self.weather_service = weather_service
         self.electricity_price_service = electricity_price_service
         self.configuration = configuration
-        self.scheduler = BackgroundScheduler()
+        self.scheduler = BlockingScheduler()
 
     def _plan_weather_data_regeneration_job(self):
         """
