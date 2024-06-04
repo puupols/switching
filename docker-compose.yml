@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/usr/src/app
+    command: ["gunicorn", "-b", "0.0.0.0:5000", "src.app:app"]
+
+  jobs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/usr/src/app
+    command: ["python", "src/jobs.py"]

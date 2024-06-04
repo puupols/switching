@@ -9,3 +9,5 @@ python-dotenv
 marshmallow
 flask_smorest
 flask-jwt-extended
+psycopg2-binary
+gunicorn

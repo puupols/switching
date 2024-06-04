@@ -24,6 +24,5 @@ Adding new switches is straightforward: simply create a new file in the switch_s
 3. Check and configure environment variables from the .env.example file
 
 ## Usage:
-Run the application by running the following script:
-python src/app.py
-
+Run the application by building and running docker containers:
+docker-compose up --build
