@@ -5,7 +5,7 @@ from src.job_service.job_service import JobService
 
 class TestJobService(unittest.TestCase):
 
-    @patch('src.job_service.job_service.BackgroundScheduler')
+    @patch('src.job_service.job_service.BlockingScheduler')
     def setUp(self, mock_scheduler):
         self.mock_weather_service = Mock()
         self.mock_electricity_price_service = Mock()
