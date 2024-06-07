@@ -4,8 +4,7 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_smorest import Api
 from src.configuration.base_configuration import BaseConfiguration
-from src.rest_api.schemas import UserSchema
-from src.rest_api.resources.user import Login, blp  # Adjust the import according to your module structure
+from src.rest_api.resources.user import Login, blp
 import inject
 
 

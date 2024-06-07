@@ -11,9 +11,10 @@ class TestFlaskRESTAPI(unittest.TestCase):
     @patch('src.rest_api.flask_rest_api.Api')
     @patch('src.rest_api.flask_rest_api.JWTManager')
     @patch('src.rest_api.flask_rest_api.SwitchBlueprint')
+    @patch('src.rest_api.flask_rest_api.SwitchStatusBlueprint')
     @patch('src.rest_api.flask_rest_api.UserBlueprint')
     @patch('src.rest_api.flask_rest_api.Flask')
-    def test_create_app(self, mock_flask, mock_switch_blueprint, mock_user_blueprint, mock_jwt_manager, mock_api):
+    def test_create_app(self, mock_flask, mock_switch_blueprint, mock_switch_status_blueprint, mock_user_blueprint, mock_jwt_manager, mock_api):
 
         # Setup
         mock_config = MagicMock(spec=BaseConfiguration)
@@ -44,6 +45,7 @@ class TestFlaskRESTAPI(unittest.TestCase):
         # Check if blueprints are registered
         mock_api_instance.register_blueprint.assert_any_call(mock_switch_blueprint)
         mock_api_instance.register_blueprint.assert_any_call(mock_user_blueprint)
+        mock_api_instance.register_blueprint.assert_any_call(mock_switch_status_blueprint)
 
         # Check if JWTManager is initialized
         mock_jwt_manager.assert_called_once_with(mock_app)
