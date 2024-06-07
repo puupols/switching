@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABC
 from src.configuration.base_configuration import BaseConfiguration
+import logging
 
 
 class BaseElectricityPriceAPI(ABC):
@@ -9,6 +10,7 @@ class BaseElectricityPriceAPI(ABC):
     Attributes:
         configuration (BaseConfiguration): Configuration object that holds settings
                                            such as API keys and URLs.
+        logger (Logger): Logger instance for logging messages.
 
     Methods:
         get_electricity_price: Abstract method that should be implemented to fetch
@@ -24,6 +26,7 @@ class BaseElectricityPriceAPI(ABC):
                                                necessary parameters and credentials for the API.
         """
         self.configuration = configuration
+        self.logger = logging.getLogger(__name__)
 
     @abstractmethod
     def get_electricity_price(self):

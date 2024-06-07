@@ -8,9 +8,16 @@ from src.weather_service.models.weather_model import WeatherModel
 
 class TestOpenMeteoWeatherProcessor(unittest.TestCase):
 
+    def _get_data(self, file_name):
+        base_path = Path(__file__).parent.parent.parent
+        file_path = base_path / 'weather_service' / 'data' / file_name
+        with file_path.open('r') as file:
+            raw_data = file.read()
+        return json.loads(raw_data)
+
     def test_process_raw_data(self):
         # Setup
-        self.data = self._get_data()
+        self.data = self._get_data('open_meteo_sample_response.json')
         self.processor = OpenMeteoWeatherProcessor()
 
         # Actions
@@ -26,9 +33,13 @@ class TestOpenMeteoWeatherProcessor(unittest.TestCase):
         self.assertEqual(processed_data[0].temperature, 11.7)
         self.assertEqual(processed_data[0].sunshine_duration, 0.0)
 
-    def _get_data(self):
-        base_path = Path(__file__).parent.parent.parent
-        file_path = base_path / 'weather_service' / 'data' / 'open_meteo_sample_response.json'
-        with file_path.open('r') as file:
-            raw_data = file.read()
-        return json.loads(raw_data)
+    def test_process_raw_data_missing_data(self):
+        # Setup
+        self.data = self._get_data('open_meteo_sample_response_missing_data.json')
+        self.processor = OpenMeteoWeatherProcessor()
+
+        # Actions
+        processed_data = self.processor.process_raw_data(self.data)
+
+        # Asserts
+        self.assertIsNone(processed_data)
