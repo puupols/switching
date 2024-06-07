@@ -3,8 +3,9 @@ import inject
 from src.configuration.base_configuration import BaseConfiguration
 from flask import Flask
 from flask_smorest import Api
-from .resources.switch import blp as SwitchBlueprint
+from .resources.switch_status import blp as SwitchStatusBlueprint
 from .resources.user import blp as UserBlueprint
+from .resources.switch import blp as SwitchBlueprint
 from flask_jwt_extended import JWTManager
 
 
@@ -64,11 +65,11 @@ class FlaskRESTAPI:
         app.config["OPENAPI_SWAGGER_UI_URL"] = self.OPENAPI_SWAGGER_UI_URL
 
         api = Api(app)
-        api.register_blueprint(SwitchBlueprint)
+        api.register_blueprint(SwitchStatusBlueprint)
         api.register_blueprint(UserBlueprint)
+        api.register_blueprint(SwitchBlueprint)
 
         app.config["JWT_SECRET_KEY"] = self.configuration.get("JWT_SECRET_KEY")
         jwt = JWTManager(app)
 
         return app
-

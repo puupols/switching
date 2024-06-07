@@ -2,10 +2,12 @@ import logging
 import inject
 from src.configuration.base_configuration import BaseConfiguration
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import create_engine, Table, Column, MetaData, Integer, DateTime, Float, UniqueConstraint
+from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker, registry
 from src.weather_service.models.weather_model import WeatherModel
 from src.electricity_price_service.models.electricity_price_model import ElectricityPriceModel
+from src.switch_service.models.switch_model import SwitchModel
+from src.repository_service.tables.registry import initialize_tables
 
 
 class RepositoryService:
@@ -30,10 +32,9 @@ class RepositoryService:
     @inject.autoparams()
     def __init__(self, configuration: BaseConfiguration):
         """
-        Initializes the RepositoryService with the given configuration.
-
-        Args:
-            configuration (BaseConfiguration): Configuration object for retrieving service settings.
+        Initializes the RepositoryService with the provided configuration.
+        Creates the SQLAlchemy engine, session maker, and metadata objects.
+        Initializes the database tables.
         """
         self.configuration = configuration
         self.logger = logging.getLogger(__name__)
@@ -41,37 +42,15 @@ class RepositoryService:
         self.session_maker = sessionmaker(bind=self.engine)
         self.metadata = MetaData()
         self.mapper_registry = registry()
-        self._define_tables()
-
-    def _define_tables(self):
-        """
-        Defines the database tables for weather and electricity price data.
-        """
-        self.weather_table = Table(
-            'weather', self.metadata,
-            Column('id', Integer, primary_key=True),
-            Column('datetime', DateTime, index=True),
-            Column('cloud_cover', Float),
-            Column('temperature', Float),
-            Column('latitude', Float, index=True),
-            Column('longitude', Float, index=True),
-            Column('sunshine_duration', Float),
-            UniqueConstraint('datetime', 'latitude', 'longitude', name='uix_datetime_lat_long')
-        )
-        self.electricity_price_table = Table(
-            'electricity_price', self.metadata,
-            Column('id', Integer, primary_key=True),
-            Column('datetime', DateTime, index=True),
-            Column('price', Float),
-            UniqueConstraint('datetime', name='uix_datetime')
-        )
+        self.tables = initialize_tables(self.metadata)
 
     def create_database(self):
         """
-        Creates the database and maps the WeatherModel and ElectricityPriceModel to the respective tables.
+        Creates the database and maps the WeatherModel, ElectricityPriceModel and SwitchModel to the respective tables.
         """
-        self.mapper_registry.map_imperatively(WeatherModel, self.weather_table)
-        self.mapper_registry.map_imperatively(ElectricityPriceModel, self.electricity_price_table)
+        self.mapper_registry.map_imperatively(WeatherModel, self.tables['weather'])
+        self.mapper_registry.map_imperatively(ElectricityPriceModel, self.tables['electricity_price'])
+        self.mapper_registry.map_imperatively(SwitchModel, self.tables['switch'])
         self.metadata.create_all(self.engine)
 
     def store_weather_data(self, weather_data):
@@ -172,3 +151,64 @@ class RepositoryService:
         """
         with self.session_maker() as session:
             return session.query(ElectricityPriceModel).filter(ElectricityPriceModel.datetime > date).all()
+
+    def store_switch_data(self, switch):
+        """
+        Stores a switch object into the database.
+
+        Args: switch (SwitchModel): SwitchModel object to be stored in the database.
+
+        Returns:
+            None, raises an IntegrityError if the switch already exists in the database.
+        """
+        try:
+            with self.session_maker() as session:
+                session.add(switch)
+                session.commit()
+        except IntegrityError:
+            self.logger.error(f"Switch with name {switch.name} already exists in the database.")
+            raise
+        except Exception as e:
+            self.logger.error(f"Error storing switch data into database. Error = {e}")
+            raise
+
+    def update_switch_data(self, switch):
+        """
+        Updates an existing switch object in the database.
+
+        Args:
+            switch (SwitchModel): SwitchModel object to be updated in the database.
+
+        Returns:
+            None, raises a ValueError if the switch does not exist in the database.
+        """
+        try:
+            with self.session_maker() as session:
+                try:
+                    existing_switch = self.get_switch(switch.name)
+                except ValueError as ve:
+                    self.logger.error(f"ValueError in get_switch: {ve}")
+                    raise ve
+                existing_switch.status_calculation_logic = switch.status_calculation_logic
+                session.add(existing_switch)
+                session.commit()
+        except Exception as e:
+            self.logger.error(f"Error updating switch data into database. Error = {e}")
+            raise e
+
+    def get_switch(self, name):
+        """
+        Retrieves a switch object from the database based on the switch name.
+
+        Args:
+            name (str): The name of the switch to be retrieved.
+
+        Returns:
+            SwitchModel: SwitchModel object retrieved from the database. ValueError is raised if the switch does not exist.
+        """
+        with self.session_maker() as session:
+            existing_switch = session.query(SwitchModel).filter(SwitchModel.name == name).first()
+            if existing_switch:
+                return existing_switch
+            else:
+                raise ValueError(f"Switch with name {name} does not exist in the database.")

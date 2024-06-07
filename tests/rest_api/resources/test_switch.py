@@ -5,9 +5,8 @@ from flask_jwt_extended import create_access_token, JWTManager
 from flask_smorest import Api
 from src.switch_service.switch_service import SwitchService
 from src.rest_api.resources.switch import Switch, blp
+from src.switch_service.models.switch_model import SwitchModel
 import inject
-
-
 
 class TestSwitch(unittest.TestCase):
 
@@ -31,6 +30,7 @@ class TestSwitch(unittest.TestCase):
 
         def configure_injector(binder):
             binder.bind(SwitchService, self.mock_switch_service)
+
         inject.configure(configure_injector)
 
         self.switch_view = Switch(switch_service=self.mock_switch_service)
@@ -41,50 +41,147 @@ class TestSwitch(unittest.TestCase):
     def tearDown(self):
         inject.clear()
 
-
-
-    @patch('src.rest_api.resources.switch.SwitchSchema')
     @patch('src.rest_api.resources.switch.jwt_required')
-    def test_get_switch_status_success(self, mock_jwt_required, mock_schema):
+    def test_post_switch_success(self, mock_jwt_required):
         # Setup
-        mock_jwt_required.return_value = lambda fn: fn
-        self.mock_switch_service.get_switch_status.return_value = "ON"
-        mock_schema.return_value.load.return_value = {"name": "test_switch"}
+        switch_data = {
+            "name": "test_switch",
+            "status_calculation_logic": "some logic"
+        }
 
+        mock_jwt_required.return_value = lambda fn: fn
         headers = {
             'Authorization': f'Bearer {self.access_token}',
             'Content-Type': 'application/json'
         }
 
         # Actions
-        with self.app.app_context():
-            response = self.client.get("/switch/status", json={"name": "test_switch"}, headers=headers)
+        response = self.client.post("/switch", json=switch_data, headers=headers)
+
+        # Asserts
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json, switch_data)
+
+    @patch('src.rest_api.resources.switch.jwt_required')
+    def test_post_switch_failure(self, mock_jwt_required):
+        # Setup
+        switch_data = {
+            "name": "test_switch",
+            "status_calculation_logic": "some logic"
+        }
+        self.mock_switch_service.store_switch_data.side_effect = Exception("Some error")
+        mock_jwt_required.return_value = lambda fn: fn
+        headers = {
+            'Authorization': f'Bearer {self.access_token}',
+            'Content-Type': 'application/json'
+        }
+
+        # Actions
+        response = self.client.post("/switch", json=switch_data, headers=headers)
+
+        # Asserts
+        self.assertEqual(response.status_code, 500)
+
+    @patch('src.rest_api.resources.switch.jwt_required')
+    def test_post_switch_exists(self, mock_jwt_required):
+        # Setup
+        switch_data = {
+            "name": "test_switch",
+            "status_calculation_logic": "some logic"
+        }
+        self.mock_switch_service.store_switch_data.side_effect = ValueError("Switch already exists")
+        mock_jwt_required.return_value = lambda fn: fn
+        headers = {
+            'Authorization': f'Bearer {self.access_token}',
+            'Content-Type': 'application/json'
+        }
+
+        # Actions
+        response = self.client.post("/switch", json=switch_data, headers=headers)
+
+        # Asserts
+        self.assertEqual(response.status_code, 500)
+
+    @patch('src.rest_api.resources.switch.jwt_required')
+    def test_put_switch_success(self, mock_jwt_required):
+        # Setup
+        switch_data = {
+            "name": "test_switch",
+            "status_calculation_logic": "some logic"
+        }
+        mock_jwt_required.return_value = lambda fn: fn
+        headers = {
+            'Authorization': f'Bearer {self.access_token}',
+            'Content-Type': 'application/json'
+        }
+
+        # Actions
+        response = self.client.put("/switch", json=switch_data, headers=headers)
+
+        # Asserts
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, switch_data)
+
+    @patch('src.rest_api.resources.switch.jwt_required')
+    def test_put_switch_failure(self, mock_jwt_required):
+        # Setup
+        switch_data = {
+            "name": "test_switch",
+            "status_calculation_logic": "some logic"
+        }
+        self.mock_switch_service.update_switch_data.side_effect = ValueError("Switch not found")
+        mock_jwt_required.return_value = lambda fn: fn
+        headers = {
+            'Authorization': f'Bearer {self.access_token}',
+            'Content-Type': 'application/json'
+        }
+
+        # Actions
+        response = self.client.put("/switch", json=switch_data, headers=headers)
+
+        # Asserts
+        self.assertEqual(response.status_code, 404)
+
+    @patch('src.rest_api.resources.switch.jwt_required')
+    def test_get_switch_success(self, mock_jwt_required):
+        # Setup
+        switch_data = {
+            "name": "test_switch"
+        }
+        mock_switch = SwitchModel(name="test_switch", status_calculation_logic="some logic")
+        self.mock_switch_service.get_switch_data.return_value = mock_switch
+        mock_jwt_required.return_value = lambda fn: fn
+        headers = {
+            'Authorization': f'Bearer {self.access_token}',
+            'Content-Type': 'application/json'
+        }
+
+        # Actions
+        response = self.client.get("/switch", json=switch_data, headers=headers)
 
         # Asserts
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
             "name": "test_switch",
-            "details": {"status": "ON"}
+            'status': None,
+            "status_calculation_logic": "some logic"
         })
 
-    @patch('src.rest_api.resources.switch.SwitchSchema')
     @patch('src.rest_api.resources.switch.jwt_required')
-    def test_get_switch_status_error(self, mock_jwt_required, mock_schema):
-
+    def test_get_switch_failure(self, mock_jwt_required):
         # Setup
+        switch_data = {
+            "name": "test_switch"
+        }
+        self.mock_switch_service.get_switch_data.side_effect = ValueError("Switch not found")
         mock_jwt_required.return_value = lambda fn: fn
-        self.mock_switch_service.get_switch_status.return_value = Switch.SWITCH_VALUE_IF_ERROR_OCCURRED
-        mock_schema.return_value.load.return_value = {"name": "test_switch"}
-
         headers = {
             'Authorization': f'Bearer {self.access_token}',
             'Content-Type': 'application/json'
         }
 
         # Actions
-        with self.app.app_context():
-            response = self.client.get("/switch/status", json={"name": "test_switch"}, headers=headers)
+        response = self.client.get("/switch", json=switch_data, headers=headers)
 
         # Asserts
-        self.assertEqual(response.status_code, 500)
-        self.assertIn("Could not process request for the switch with name test_switch", response.json["message"])
+        self.assertEqual(response.status_code, 404)
