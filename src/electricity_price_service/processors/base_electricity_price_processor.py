@@ -1,3 +1,4 @@
+import logging
 from abc import ABC, abstractmethod
 
 
@@ -13,7 +14,7 @@ class BaseElectricityPriceProcessor:
     """
 
     def __init__(self):
-        pass
+        self.logger = logging.getLogger(__name__)
 
     @abstractmethod
     def process_data(self, raw_data):

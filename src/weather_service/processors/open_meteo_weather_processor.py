@@ -28,18 +28,37 @@ class OpenMeteoWeatherProcessor(BaseWeatherProcessor):
 
         Returns:
             list[WeatherModel]: A list of WeatherModel instances representing the processed weather data.
+            Returns None if the data cannot be processed or is missing required fields.
         """
         weather_data = []
-        latitude = raw_data['latitude']
-        longitude = raw_data['longitude']
+
+        try:
+            latitude = raw_data['latitude']
+            longitude = raw_data['longitude']
+        except KeyError as e:
+            self.logger.error(f'Failed to extract latitude and longitude from weather data: {e}')
+            return None
+        except Exception as e:
+            self.logger.error(f'An unexpected error occurred: {e}')
+            return None
 
         for i in range(len(raw_data['hourly']['time'])):
-            date_string = raw_data['hourly']['time'][i]
-            date_obj = datetime.strptime(date_string, self.OPEN_METEO_DATE_FORMAT)
-            cloud_cover = raw_data['hourly']['cloud_cover'][i]
-            temperature = raw_data['hourly']['temperature'][i]
-            sunshine_duration = raw_data['hourly']['sunshine_duration'][i]
-            weather = WeatherModel(date_obj, cloud_cover, temperature, latitude, longitude, sunshine_duration)
-            weather_data.append(weather)
+            try:
+                date_string = raw_data['hourly']['time'][i]
+                date_obj = datetime.strptime(date_string, self.OPEN_METEO_DATE_FORMAT)
+                cloud_cover = raw_data['hourly']['cloud_cover'][i]
+                temperature = raw_data['hourly']['temperature'][i]
+                sunshine_duration = raw_data['hourly']['sunshine_duration'][i]
+                weather = WeatherModel(date_obj, cloud_cover, temperature, latitude, longitude, sunshine_duration)
+                weather_data.append(weather)
+            except KeyError as e:
+                self.logger.error(f'KeyError: Missing key {e} in raw_data[hourly] at index {i}')
+                return None
+            except ValueError as e:
+                self.logger.error(f'ValueError: {e} in raw_data[hourly] at index {i}')
+                return None
+            except Exception as e:
+                self.logger.error(f'An unexpected error occurred: {e} in raw_data[hourly] at index {i}')
+                return None
 
         return weather_data

@@ -1,4 +1,5 @@
 from src.electricity_price_service.api.base_electricity_price_api import BaseElectricityPriceAPI
+from requests.exceptions import RequestException
 import requests
 
 
@@ -20,7 +21,21 @@ class NordpoolElectricityPriceAPI(BaseElectricityPriceAPI):
 
         Returns:
             dict: A JSON dictionary containing the latest electricity price data fetched from Nordpool.
+            Returns None if the request fails or the response cannot be parsed.
         """
-        nordpool_url = self.configuration.get(self.NORDPOOL_URL_CONFIG_NAME)
-        resp = requests.get(nordpool_url)
-        return resp.json()
+        try:
+            nordpool_url = self.configuration.get(self.NORDPOOL_URL_CONFIG_NAME)
+            self.logger.debug(f'Fetching electricity price from Nordpool: {nordpool_url}')
+            resp = requests.get(nordpool_url)
+        except RequestException as e:
+            self.logger.error(f'Failed to fetch electricity price from Nordpool: {e}')
+            return None
+        except Exception as e:
+            self.logger.error(f'Failed to fetch electricity price from Nordpool: {e}')
+            return None
+        try:
+            electricity_price_data = resp.json()
+        except ValueError as e:
+            self.logger.error(f'Failed to parse JSON response from Nordpool: {e}')
+            return None
+        return electricity_price_data

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import logging
 
 
 class BaseWeatherProcessor(ABC):
@@ -13,7 +14,7 @@ class BaseWeatherProcessor(ABC):
     """
 
     def __init__(self):
-        pass
+        self.logger = logging.getLogger(__name__)
 
     @abstractmethod
     def process_raw_data(self, raw_data):

@@ -1,8 +1,9 @@
+import logging
 from abc import ABC, abstractmethod
 from src.configuration.base_configuration import BaseConfiguration
 
 
-class BaseWeatherAPI:
+class BaseWeatherAPI(ABC):
     """
     An abstract base class that defines the interface for weather data APIs.
 
@@ -11,10 +12,12 @@ class BaseWeatherAPI:
 
     Attributes:
         configuration (BaseConfiguration): A configuration object which stores API keys, endpoints, and other necessary configuration settings.
+        logger (Logger): A logger object used to log messages to the console or a file.
     """
 
     def __init__(self, configuration: BaseConfiguration):
         self.configuration = configuration
+        self.logger = logging.getLogger(__name__)
 
     @abstractmethod
     def get_weather_data(self,  latitude, longitude):

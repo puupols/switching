@@ -27,3 +27,19 @@ class TestOpenMeteoWeatherAPI(unittest.TestCase):
         response.json.assert_called_once()
         self.assertEqual(result, data)
 
+    @patch('src.weather_service.api.open_meteo_weather_api.requests')
+    def test_get_weather_data_request_exception(self, mock_requests):
+        # Setup
+        mock_requests.get.side_effect = Exception('Boom!')
+        mock_configuration = Mock()
+        mock_configuration.get.side_effect = lambda key: {
+            'open_meteo_url': 'https://api.openmeteo.com?latitude={latitude}&longitude={longitude}&weather_data_types={weather_data_types}&forecast_days={forecast_days}&timezone={timezone}'}[
+            key]
+        api_service = OpenMeteoWeatherAPI(mock_configuration)
+
+        # Action
+        result = api_service.get_weather_data(52.555, 24.5555)
+
+        # Assertion
+        self.assertIsNone(result)
+
