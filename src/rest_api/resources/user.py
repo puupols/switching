@@ -108,10 +108,11 @@ class User(MethodView):
             Error 404: If the user is not found.
             Error 500: If an error occurred while deleting user data.
         """
+        user_name = user_data["user_name"]
         try:
-            existing_user = self.user_service.get_user(user_data["user_name"])
+            existing_user = self.user_service.get_user(user_name)
         except ValueError:
-            self.logger.error(f"User with name {user_data['user_name']} does not exist in the database.")
+            self.logger.error(f"User with name {user_name} does not exist in the database.")
             abort(404, message="User not found.")
 
         if existing_user.id != get_jwt_identity():
@@ -119,12 +120,12 @@ class User(MethodView):
             abort(401, message="You are not authorized to delete this user.")
 
         try:
-            self.user_service.delete_user(user_data["user_name"])
+            self.user_service.delete_user(user_name)
         except Exception as e:
             self.logger.error(f"Error deleting user data from database. Error - {e}")
             abort(500, message="An error occurred while deleting user data.")
 
-        return {"message": f"User with user name {user_data["user_name"]} deleted successfully!"}, 200
+        return {"message": f"User with user name {user_name} deleted successfully!"}, 200
 
     @blp.arguments(UserGetSchema)
     @blp.response(200, UserSchema)
