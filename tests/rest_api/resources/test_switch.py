@@ -185,3 +185,45 @@ class TestSwitch(unittest.TestCase):
 
         # Asserts
         self.assertEqual(response.status_code, 404)
+
+    @patch('src.rest_api.resources.switch.jwt_required')
+    def test_delete_switch_success(self, mock_jwt_required):
+        # Setup
+        switch_data = {
+            "name": "test_switch"
+        }
+        mock_jwt_required.return_value = lambda fn: fn
+        headers = {
+            'Authorization': f'Bearer {self.access_token}',
+            'Content-Type': 'application/json'
+        }
+        self.mock_switch_service.delete_switch.return_value = None
+
+        # Actions
+        response = self.client.delete("/switch", json=switch_data, headers=headers)
+
+        # Asserts
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, switch_data)
+
+    @patch('src.rest_api.resources.switch.jwt_required')
+    def test_delete_switch_failure(self, mock_jwt_required):
+        # Setup
+        switch_data = {
+            "name": "test_switch"
+        }
+        mock_jwt_required.return_value = lambda fn: fn
+        headers = {
+            'Authorization': f'Bearer {self.access_token}',
+            'Content-Type': 'application/json'
+        }
+        self.mock_switch_service.delete_switch.side_effect = ValueError("Switch not found")
+
+        # Actions
+        response = self.client.delete("/switch", json=switch_data, headers=headers)
+
+        # Asserts
+        self.assertEqual(response.status_code, 404)
+
+
+

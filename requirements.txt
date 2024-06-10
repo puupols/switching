@@ -11,3 +11,4 @@ flask_smorest
 flask-jwt-extended
 psycopg2-binary
 gunicorn
+passlib

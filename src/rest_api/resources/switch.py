@@ -94,6 +94,7 @@ class Switch(MethodView):
         Returns:
             dict: Dictionary containing the switch data.
             Error 404: If the switch is not found.
+            Error 500: If an error occurred while getting switch data.
         """
         switch_name = switch_data["name"]
         try:
@@ -101,6 +102,35 @@ class Switch(MethodView):
         except ValueError as e:
             self.logger.error(f"Error getting switch data from the database for the switch name {switch_name}. Error = {e}")
             abort(404, message=f"Switch with the name {switch_name} not found.")
+        except Exception as e:
+            self.logger.error(f"Error getting switch data from the database for the switch name {switch_name}. Error = {e}")
+            abort(500, message="An error occurred while getting switch data.")
         return switch
+
+    @blp.arguments(SwitchGetSchema)
+    @blp.response(200, SwitchSchema)
+    @jwt_required()
+    def delete(self, switch_data):
+        """
+        Deletes the switch data from the database.
+
+        Arguments:
+            switch_data (dict): Dictionary containing the switch data.
+
+        Returns:
+            dict: Dictionary containing the switch data.
+            Error 404: If the switch is not found.
+            Error 500: If an error occurred while deleting switch data.
+        """
+        switch_name = switch_data["name"]
+        try:
+            self.switch_service.delete_switch(switch_name)
+        except ValueError as e:
+            self.logger.error(f"Error deleting switch data from the database for the switch name {switch_name}. Error = {e}")
+            abort(404, message=f"Switch with the name {switch_name} not found.")
+        except Exception as e:
+            self.logger.error(f"Error deleting switch data from the database for the switch name {switch_name}. Error = {e}")
+            abort(500, message="An error occurred while deleting switch data.")
+        return switch_data
 
 

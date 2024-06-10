@@ -1,7 +1,7 @@
 import inject
 from src.weather_service.api.base_weather_api import BaseWeatherAPI
 from src.weather_service.processors.base_weather_processor import BaseWeatherProcessor
-from src.repository_service.repository_service import RepositoryService
+from src.repository_service.weather_repository_service import WeatherRepositoryService
 from src.location_service.base_location_service import BaseLocationService
 
 
@@ -16,13 +16,13 @@ class WeatherService:
     Attributes:
         weather_api (BaseWeatherAPI): The API client for fetching raw weather data.
         weather_processor (BaseWeatherProcessor): The processor for converting raw data into structured data.
-        repository_service (RepositoryService): The service for storing and retrieving processed weather data.
+        repository_service (WeatherRepositoryService): The service for storing and retrieving processed weather data.
         location_service (BaseLocationService): The service for obtaining the current geographic location.
     """
 
     @inject.autoparams()
     def __init__(self, weather_api: BaseWeatherAPI, weather_processor: BaseWeatherProcessor,
-                 repository_service: RepositoryService,
+                 repository_service: WeatherRepositoryService,
                  location_service: BaseLocationService):
         """
         Initializes the WeatherService with the necessary components for managing weather data.

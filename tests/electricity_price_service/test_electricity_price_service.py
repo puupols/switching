@@ -1,7 +1,7 @@
 from src.electricity_price_service.electricity_price_service import ElectricityPriceService
 from src.electricity_price_service.api.base_electricity_price_api import BaseElectricityPriceAPI
 from src.electricity_price_service.processors.base_electricity_price_processor import BaseElectricityPriceProcessor
-from src.repository_service.repository_service import RepositoryService
+from src.repository_service.electricity_price_repository_service import ElectricityPriceRepositoryService
 from unittest.mock import Mock
 import unittest
 
@@ -10,7 +10,7 @@ class TestElectricityPriceService(unittest.TestCase):
     def setUp(self):
         self.mock_api = Mock(spec=BaseElectricityPriceAPI)
         self.mock_processor = Mock(spec=BaseElectricityPriceProcessor)
-        self.mock_repository = Mock(spec=RepositoryService)
+        self.mock_repository = Mock(spec=ElectricityPriceRepositoryService)
         self.service = ElectricityPriceService(self.mock_api, self.mock_processor, self.mock_repository)
 
     def test_regenerate_electricity_price_date(self):
