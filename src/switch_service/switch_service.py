@@ -1,7 +1,7 @@
 from src.configuration.base_configuration import BaseConfiguration
 from src.weather_service.weather_service import WeatherService
 from src.electricity_price_service.electricity_price_service import ElectricityPriceService
-from src.repository_service.repository_service import RepositoryService
+from src.repository_service.switch_repository_service import SwitchRepositoryService
 from src.switch_service.models.switch_model import SwitchModel
 import inject
 import logging
@@ -19,14 +19,14 @@ class SwitchService:
     def __init__(self, configuration: BaseConfiguration,
                  weather_service: WeatherService,
                  electricity_price_service: ElectricityPriceService,
-                 repository_service: RepositoryService):
+                 repository_service: SwitchRepositoryService):
         """
         Initializes the SwitchService with the configuration, WeatherService, ElectricityPriceService, and RepositoryService.
         Arguments:
             configuration (BaseConfiguration): The configuration object.
             weather_service (WeatherService): The WeatherService object.
             electricity_price_service (ElectricityPriceService): The ElectricityPriceService object.
-            repository_service (RepositoryService): The RepositoryService object.
+            repository_service (SwitchRepositoryService): The RepositoryService object.
 
         """
         self.configuration = configuration
@@ -122,3 +122,12 @@ class SwitchService:
             SwitchModel: The switch data.
         """
         return self.repository_service.get_switch(switch_name)
+
+    def delete_switch(self, switch_name):
+        """
+        Deletes the switch data from the database.
+
+        Arguments:
+            switch_name (str): The name of the switch.
+        """
+        self.repository_service.delete_switch(switch_name)

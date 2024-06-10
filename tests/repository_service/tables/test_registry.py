@@ -8,13 +8,13 @@ class TestRegistry(TestCase):
     def test_should_initialize_all_tables(self):
         # Setup
         metadata = MetaData()
-        expected_table_names = ['weather', 'electricity_price', 'switch']
+        expected_table_names = ['weather', 'electricity_price', 'switch', 'user']
 
         # Actions
         tables = initialize_tables(metadata)
 
         # Asserts
-        self.assertEqual(3, len(tables))
+        self.assertEqual(4, len(tables))
         for table_name in expected_table_names:
             self.assertIn(table_name, tables)
             self.assertEqual(table_name, tables[table_name].name)

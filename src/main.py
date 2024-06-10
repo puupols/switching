@@ -1,7 +1,7 @@
 import inject
 from src.job_service.job_service import JobService
 from src.rest_api.flask_rest_api import FlaskRESTAPI
-from src.repository_service.repository_service import RepositoryService
+from src.repository_service.base_repository_service import BaseRepositoryService
 
 
 class Main:
@@ -16,18 +16,18 @@ class Main:
     Attributes:
         job_service (JobService): The service responsible for managing and scheduling background jobs.
         rest_api (FlaskRESTAPI): The REST API service that handles HTTP requests.
-        repository_service (RepositoryService): The service responsible for managing database interactions.
+        repository_service (BaseRepositoryService): The service responsible for managing database interactions.
     """
 
     @inject.autoparams()
-    def __init__(self, job_service: JobService, rest_api: FlaskRESTAPI, repository_service: RepositoryService):
+    def __init__(self, job_service: JobService, rest_api: FlaskRESTAPI, repository_service: BaseRepositoryService):
         """
         Initializes the Main class with a job service, REST API service, and repository service.
 
         Args:
             job_service (JobService): An instance of JobService to manage background job scheduling.
             rest_api (FlaskRESTAPI): An instance of FlaskRESTAPI to handle and respond to RESTful requests.
-            repository_service (RepositoryService): An instance of RepositoryService to manage database interactions.
+            repository_service (BaseRepositoryService): An instance of RepositoryService to manage database interactions.
         """
         self.job_service = job_service
         self.rest_api = rest_api

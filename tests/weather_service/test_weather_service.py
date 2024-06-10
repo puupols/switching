@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import Mock
 from src.weather_service.api.base_weather_api import BaseWeatherAPI
 from src.weather_service.processors.base_weather_processor import BaseWeatherProcessor
-from src.repository_service.repository_service import RepositoryService
+from src.repository_service.weather_repository_service import WeatherRepositoryService
 from src.location_service.base_location_service import BaseLocationService
 from src.weather_service.weather_service import WeatherService
 
@@ -12,7 +12,7 @@ class TestWeatherService(unittest.TestCase):
     def setUp(self):
         self.mock_weather_api = Mock(spec=BaseWeatherAPI)
         self.mock_weather_processor = Mock(spec=BaseWeatherProcessor)
-        self.mock_repository_service = Mock(spec=RepositoryService)
+        self.mock_repository_service = Mock(spec=WeatherRepositoryService)
         self.mock_location_service = Mock(spec=BaseLocationService)
         self.weather_service = WeatherService(self.mock_weather_api, self.mock_weather_processor,
                                               self.mock_repository_service, self.mock_location_service)
