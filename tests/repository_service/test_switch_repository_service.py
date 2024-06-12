@@ -22,7 +22,7 @@ class TestRepositoryService(unittest.TestCase):
 
     def test_store_switch_data(self):
         # Setup
-        switch = SwitchModel(name="Switch 1", status_calculation_logic="status_calculation_logic")
+        switch = SwitchModel(name="Switch 1", place_id='1', status_calculation_logic="status_calculation_logic")
         expected_name = switch.name
         # Actions
         self.switch_repository_service.store_switch_data(switch)
@@ -35,8 +35,8 @@ class TestRepositoryService(unittest.TestCase):
 
     def test_store_switch_data_if_already_exists(self):
         # Setup
-        switch = SwitchModel(name="Switch 1", status_calculation_logic="status_calculation_logic")
-        duplicate_switch = SwitchModel(name="Switch 1", status_calculation_logic="new_status_calculation_logic")
+        switch = SwitchModel(name="Switch 1", place_id='1', status_calculation_logic="status_calculation_logic")
+        duplicate_switch = SwitchModel(name="Switch 1", place_id='1', status_calculation_logic="new_status_calculation_logic")
 
         # Actions
         self.switch_repository_service.store_switch_data(switch)
@@ -47,8 +47,8 @@ class TestRepositoryService(unittest.TestCase):
 
     def test_update_switch_data(self):
         # Setup
-        switch = SwitchModel(name="Switch 1", status_calculation_logic="status_calculation_logic")
-        updated_switch = SwitchModel(name="Switch 1", status_calculation_logic="new_status_calculation_logic")
+        switch = SwitchModel(name="Switch 1", place_id='1', status_calculation_logic="status_calculation_logic")
+        updated_switch = SwitchModel(name="Switch 1", place_id='1', status_calculation_logic="new_status_calculation_logic")
 
         # Actions
         self.switch_repository_service.store_switch_data(switch)
@@ -60,8 +60,8 @@ class TestRepositoryService(unittest.TestCase):
 
     def test_update_switch_data_if_not_exists(self):
         # Setup
-        switch = SwitchModel(name="Switch 1", status_calculation_logic="status_calculation_logic")
-        updated_switch = SwitchModel(name="Switch 2", status_calculation_logic="new_status_calculation_logic")
+        switch = SwitchModel(name="Switch 1", place_id='1', status_calculation_logic="status_calculation_logic")
+        updated_switch = SwitchModel(name="Switch 2", place_id='1', status_calculation_logic="new_status_calculation_logic")
 
         # Actions
         self.switch_repository_service.store_switch_data(switch)
@@ -72,7 +72,7 @@ class TestRepositoryService(unittest.TestCase):
 
     def test_get_switch(self):
         # Setup
-        switch = SwitchModel(name="Switch 1", status_calculation_logic="status_calculation_logic")
+        switch = SwitchModel(name="Switch 1", place_id='1', status_calculation_logic="status_calculation_logic")
         expected_name = switch.name
 
         # Actions
@@ -84,7 +84,7 @@ class TestRepositoryService(unittest.TestCase):
 
     def test_get_switch_if_not_exists(self):
         # Setup
-        switch = SwitchModel(name="Switch 1", status_calculation_logic="status_calculation_logic")
+        switch = SwitchModel(name="Switch 1", place_id='1', status_calculation_logic="status_calculation_logic")
 
         # Actions
         self.switch_repository_service.store_switch_data(switch)

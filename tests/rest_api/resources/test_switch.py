@@ -46,7 +46,8 @@ class TestSwitch(unittest.TestCase):
         # Setup
         switch_data = {
             "name": "test_switch",
-            "status_calculation_logic": "some logic"
+            "status_calculation_logic": "some logic",
+            "place_id": 1
         }
 
         mock_jwt_required.return_value = lambda fn: fn
@@ -67,7 +68,8 @@ class TestSwitch(unittest.TestCase):
         # Setup
         switch_data = {
             "name": "test_switch",
-            "status_calculation_logic": "some logic"
+            "status_calculation_logic": "some logic",
+            "place_id": 1
         }
         self.mock_switch_service.store_switch_data.side_effect = Exception("Some error")
         mock_jwt_required.return_value = lambda fn: fn
@@ -87,7 +89,8 @@ class TestSwitch(unittest.TestCase):
         # Setup
         switch_data = {
             "name": "test_switch",
-            "status_calculation_logic": "some logic"
+            "status_calculation_logic": "some logic",
+            "place_id": 1
         }
         self.mock_switch_service.store_switch_data.side_effect = ValueError("Switch already exists")
         mock_jwt_required.return_value = lambda fn: fn
@@ -107,7 +110,8 @@ class TestSwitch(unittest.TestCase):
         # Setup
         switch_data = {
             "name": "test_switch",
-            "status_calculation_logic": "some logic"
+            "status_calculation_logic": "some logic",
+            "place_id": 1
         }
         mock_jwt_required.return_value = lambda fn: fn
         headers = {
@@ -127,7 +131,8 @@ class TestSwitch(unittest.TestCase):
         # Setup
         switch_data = {
             "name": "test_switch",
-            "status_calculation_logic": "some logic"
+            "status_calculation_logic": "some logic",
+            "place_id": 1
         }
         self.mock_switch_service.update_switch_data.side_effect = ValueError("Switch not found")
         mock_jwt_required.return_value = lambda fn: fn
@@ -146,9 +151,10 @@ class TestSwitch(unittest.TestCase):
     def test_get_switch_success(self, mock_jwt_required):
         # Setup
         switch_data = {
-            "name": "test_switch"
+            "name": "test_switch",
+            "place_id": 1
         }
-        mock_switch = SwitchModel(name="test_switch", status_calculation_logic="some logic")
+        mock_switch = SwitchModel(name="test_switch", status_calculation_logic="some logic", place_id=1)
         self.mock_switch_service.get_switch_data.return_value = mock_switch
         mock_jwt_required.return_value = lambda fn: fn
         headers = {
@@ -164,14 +170,16 @@ class TestSwitch(unittest.TestCase):
         self.assertEqual(response.json, {
             "name": "test_switch",
             'status': None,
-            "status_calculation_logic": "some logic"
+            "status_calculation_logic": "some logic",
+            "place_id": 1
         })
 
     @patch('src.rest_api.resources.switch.jwt_required')
     def test_get_switch_failure(self, mock_jwt_required):
         # Setup
         switch_data = {
-            "name": "test_switch"
+            "name": "test_switch",
+            "place_id": 1
         }
         self.mock_switch_service.get_switch_data.side_effect = ValueError("Switch not found")
         mock_jwt_required.return_value = lambda fn: fn
@@ -190,7 +198,8 @@ class TestSwitch(unittest.TestCase):
     def test_delete_switch_success(self, mock_jwt_required):
         # Setup
         switch_data = {
-            "name": "test_switch"
+            "name": "test_switch",
+            "place_id": 1
         }
         mock_jwt_required.return_value = lambda fn: fn
         headers = {
@@ -210,7 +219,8 @@ class TestSwitch(unittest.TestCase):
     def test_delete_switch_failure(self, mock_jwt_required):
         # Setup
         switch_data = {
-            "name": "test_switch"
+            "name": "test_switch",
+            "place_id": 1
         }
         mock_jwt_required.return_value = lambda fn: fn
         headers = {
@@ -224,6 +234,3 @@ class TestSwitch(unittest.TestCase):
 
         # Asserts
         self.assertEqual(response.status_code, 404)
-
-
-

@@ -6,6 +6,7 @@ from flask_smorest import Api
 from .resources.switch_status import blp as SwitchStatusBlueprint
 from .resources.user import blp as UserBlueprint
 from .resources.switch import blp as SwitchBlueprint
+from .resources.place import blp as PlaceBlueprint
 from flask_jwt_extended import JWTManager
 
 
@@ -68,6 +69,7 @@ class FlaskRESTAPI:
         api.register_blueprint(SwitchStatusBlueprint)
         api.register_blueprint(UserBlueprint)
         api.register_blueprint(SwitchBlueprint)
+        api.register_blueprint(PlaceBlueprint)
 
         app.config["JWT_SECRET_KEY"] = self.configuration.get("JWT_SECRET_KEY")
         jwt = JWTManager(app)

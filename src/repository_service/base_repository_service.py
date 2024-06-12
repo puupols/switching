@@ -2,7 +2,7 @@ import logging
 
 import inject
 from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import sessionmaker, registry
+from sqlalchemy.orm import sessionmaker, registry, relationship
 
 from src.configuration.base_configuration import BaseConfiguration
 from src.electricity_price_service.models.electricity_price_model import ElectricityPriceModel
@@ -10,6 +10,7 @@ from src.repository_service.tables.registry import initialize_tables
 from src.switch_service.models.switch_model import SwitchModel
 from src.user_service.models.user_model import UserModel
 from src.weather_service.models.weather_model import WeatherModel
+from src.place_service.models.place_model import PlaceModel
 
 
 class BaseRepositoryService:
@@ -36,6 +37,11 @@ class BaseRepositoryService:
         """
         self.mapper_registry.map_imperatively(WeatherModel, self.tables['weather'])
         self.mapper_registry.map_imperatively(ElectricityPriceModel, self.tables['electricity_price'])
-        self.mapper_registry.map_imperatively(SwitchModel, self.tables['switch'])
-        self.mapper_registry.map_imperatively(UserModel, self.tables['user'])
+        self.mapper_registry.map_imperatively(SwitchModel, self.tables['switch'],
+                                              properties={'place': relationship('PlaceModel', back_populates='switch')})
+        self.mapper_registry.map_imperatively(UserModel, self.tables['user'],
+                                              properties={'place': relationship('PlaceModel', back_populates='user', lazy='dynamic')})
+        self.mapper_registry.map_imperatively(PlaceModel, self.tables['place'],
+                                              properties={'user': relationship('UserModel', back_populates='place'),
+                                                          'switch': relationship('SwitchModel', back_populates='place', lazy='dynamic')})
         self.metadata.create_all(self.engine)
