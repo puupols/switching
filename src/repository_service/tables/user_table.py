@@ -15,4 +15,3 @@ def create_user_table(metadata):
         Column('password', String(250), nullable=False),
         Column('user_email', String(80))
     )
-

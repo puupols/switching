@@ -4,7 +4,7 @@ from flask.views import MethodView
 from src.switch_service.switch_service import SwitchService
 from flask_smorest import Blueprint, abort
 from ..schemas import SwitchStatusRetrivalSchema
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.switch_service.models.switch_model import SwitchModel
 
 blp = Blueprint("switch status", __name__, description="Operations on switch status")
@@ -32,7 +32,7 @@ class SwitchStatus(MethodView):
         Retrieves the status of a switch based on the provided switch data.
 
         Args:
-            switch_data (dict): Dictionary containing the name of the switch.
+            switch_data (dict): Dictionary containing the name of the switch and place_id.
 
         Returns:
             dict: Dictionary containing the name of the switch and its status.

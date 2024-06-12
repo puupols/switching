@@ -6,7 +6,7 @@ from ..schemas import SwitchSchema, SwitchGetSchema
 from src.switch_service.switch_service import SwitchService
 from src.switch_service.models.switch_model import SwitchModel
 from sqlalchemy.exc import IntegrityError
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 blp = Blueprint("switches", __name__, description="Operations with switches")
@@ -44,13 +44,17 @@ class Switch(MethodView):
             Error 400: If a switch with the same name already exists.
             Error 500: If an error occurred while storing switch data.
         """
+        place_id = switch_data["place_id"]
+        name = switch_data["name"]
         try:
             switch = SwitchModel(**switch_data)
             self.switch_service.store_switch_data(switch)
             return switch_data
         except IntegrityError:
-            self.logger.error(f"Error storing switch data into database. A switch with the same name already exists.")
-            abort(400, message="A switch with the same name already exists.")
+            self.logger.error(f"Error storing switch data into database. A switch with the same name {name} "
+                              f"already exists or place does not exist id {place_id}.")
+            abort(400, message=f"A place with id {place_id} does not exist or switch with the same name {name} "
+                               f"already exists in this place.")
         except Exception as e:
             self.logger.error(f"Error storing switch data into database. Error - {e}")
             abort(500, message="An error occurred while storing switch data.")

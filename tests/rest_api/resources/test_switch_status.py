@@ -48,7 +48,7 @@ class TestSwitchStatus(unittest.TestCase):
         # Setup
         mock_jwt_required.return_value = lambda fn: fn
         self.mock_switch_service.get_switch_status.return_value = "ON"
-        mock_schema.return_value.load.return_value = {"name": "test_switch"}
+        mock_schema.return_value.load.return_value = {"name": "test_switch", "place_id": 1}
 
         headers = {
             'Authorization': f'Bearer {self.access_token}',
@@ -57,7 +57,7 @@ class TestSwitchStatus(unittest.TestCase):
 
         # Actions
         with self.app.app_context():
-            response = self.client.get("/switch/status", json={"name": "test_switch"}, headers=headers)
+            response = self.client.get("/switch/status", json={"name": "test_switch", "place_id": 1}, headers=headers)
 
         # Asserts
         self.assertEqual(response.status_code, 200)
@@ -72,7 +72,7 @@ class TestSwitchStatus(unittest.TestCase):
         # Setup
         mock_jwt_required.return_value = lambda fn: fn
         self.mock_switch_service.get_switch_status.return_value = SwitchModel.SWITCH_VALUE_IF_ERROR_OCCURRED
-        mock_schema.return_value.load.return_value = {"name": "test_switch"}
+        mock_schema.return_value.load.return_value = {"name": "test_switch", "place_id": 1}
 
         headers = {
             'Authorization': f'Bearer {self.access_token}',
@@ -81,7 +81,7 @@ class TestSwitchStatus(unittest.TestCase):
 
         # Actions
         with self.app.app_context():
-            response = self.client.get("/switch/status", json={"name": "test_switch"}, headers=headers)
+            response = self.client.get("/switch/status", json={"name": "test_switch", "place_id": 1}, headers=headers)
 
         # Asserts
         self.assertEqual(response.status_code, 500)

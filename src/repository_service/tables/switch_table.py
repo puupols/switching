@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, String, Integer
+from sqlalchemy import Table, Column, String, Integer, UniqueConstraint, ForeignKey
 
 
 def create_switch_table(metadata):
@@ -11,7 +11,9 @@ def create_switch_table(metadata):
     return Table(
         'switch', metadata,
         Column('id', Integer, primary_key=True),
-        Column('name', String(80), unique=True, nullable=False),
+        Column('place_id', Integer, ForeignKey('place.id'), nullable=False),
+        Column('name', String(80), nullable=False),
         Column('status', String(80)),
-        Column('status_calculation_logic', String(2000))
+        Column('status_calculation_logic', String(2000)),
+        UniqueConstraint('place_id', 'name', name='uix_place_id_name')
     )
