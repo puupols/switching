@@ -38,7 +38,7 @@
         },
         "src.rest_api": {
             "level": "INFO",
-            "handlers": ["RESTHandler"],
+            "handlers": ["RESTHandler", "consoleHandler"],
             "propagate": false
         }
     }
