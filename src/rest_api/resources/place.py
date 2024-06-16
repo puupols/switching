@@ -1,6 +1,8 @@
 import inject
 import logging
 from src.place_service.place_service import PlaceService
+from src.location_service.location_service import LocationService
+from src.location_service.models.location_model import LocationModel
 from src.place_service.models.place_model import PlaceModel
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
@@ -17,7 +19,7 @@ class Place(MethodView):
     """
 
     @inject.autoparams()
-    def __init__(self, place_service: PlaceService):
+    def __init__(self, place_service: PlaceService, location_service: LocationService):
         """
         Initializes the Place class with the provided PlaceService.
 
@@ -25,6 +27,7 @@ class Place(MethodView):
             place_service (PlaceService): Service class to interact
         """
         self.place_service = place_service
+        self.location_service = location_service
         self.logger = logging.getLogger(__name__)
 
     @blp.arguments(PlaceSchema)
@@ -43,12 +46,23 @@ class Place(MethodView):
             Error 500: If an error occurred while storing place data.
         """
         if place_data["user_id"] != get_jwt_identity():
-            self.logger.error(f"User {get_jwt_identity()} is not authorized to create a place for user {place_data['user_id']}")
+            self.logger.error(
+                f"User {get_jwt_identity()} is not authorized to create a place for user {place_data['user_id']}")
             abort(401, message="You are not authorized to create a place for this user.")
+
         try:
-            place = PlaceModel(**place_data)
+            location = LocationModel(**place_data["location"])
+            self.location_service.store_location_data(location)
+            stored_location = self.location_service.get_location(place_data["location"]["latitude"],
+                                                                 place_data["location"]["longitude"])
+
+            place = PlaceModel(name=place_data["name"],
+                               location_id=stored_location.id,
+                               user_id=place_data["user_id"],
+                               description=place_data["description"]
+                               )
             self.place_service.store_place_data(place)
-            return place_data
+            return place_data, 201
         except IntegrityError:
             self.logger.error(f"Error storing place data into database. A place with the same name already exists.")
             abort(400, message="A place with the same name already exists.")

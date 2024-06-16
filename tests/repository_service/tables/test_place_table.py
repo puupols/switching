@@ -16,10 +16,11 @@ class TestPlaceTable(TestCase):
         # Assert
         self.assertIsInstance(created_table, Table)
         self.assertEqual(created_table.name, expected_table_name)
-        self.assertEqual(len(created_table.columns), 4)
-        self.assertEqual(len(created_table.constraints), 3)
+        self.assertEqual(len(created_table.columns), 5)
+        self.assertEqual(len(created_table.constraints), 4)
         self.assertIn('id', created_table.columns)
         self.assertIn('user_id', created_table.columns)
+        self.assertIn('location_id', created_table.columns)
         self.assertIn('name', created_table.columns)
         self.assertIn('description', created_table.columns)
         self.assertTrue(created_table.columns['id'].primary_key)

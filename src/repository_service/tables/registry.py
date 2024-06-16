@@ -3,6 +3,7 @@ from src.repository_service.tables.electricity_price_table import create_electri
 from src.repository_service.tables.switch_table import create_switch_table
 from src.repository_service.tables.user_table import create_user_table
 from src.repository_service.tables.place_table import create_place_table
+from src.repository_service.tables.location_table import create_location_table
 
 
 def initialize_tables(metadata):
@@ -20,6 +21,7 @@ def initialize_tables(metadata):
         'electricity_price': create_electricity_price_table(metadata),
         'switch': create_switch_table(metadata),
         'user': create_user_table(metadata),
-        'place': create_place_table(metadata)
+        'place': create_place_table(metadata),
+        'location': create_location_table(metadata)
     }
     return tables

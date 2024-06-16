@@ -1,6 +1,7 @@
 from src.repository_service.base_repository_service import BaseRepositoryService
 from src.place_service.models.place_model import PlaceModel
 from src.switch_service.models.switch_model import SwitchModel
+from src.location_service.models.location_model import LocationModel
 from sqlalchemy.exc import IntegrityError
 
 
@@ -19,8 +20,8 @@ class PlaceRepositoryService(BaseRepositoryService):
             with self.session_maker() as session:
                 session.add(place)
                 session.commit()
-        except IntegrityError:
-            self.logger.error(f"Place with name {place.name} already exists in the database.")
+        except IntegrityError as ie:
+            self.logger.error(f"Place with name {place.name} already exists in the database. Error = {ie}")
             raise
         except Exception as e:
             self.logger.error(f"Error storing place data into database. Error = {e}")
@@ -61,7 +62,9 @@ class PlaceRepositoryService(BaseRepositoryService):
             if place is None:
                 raise ValueError(f"Place with name {place_name} does not exist in the database.")
             switches = session.query(SwitchModel).filter_by(place_id=place.id).all()
+            location = session.query(LocationModel).filter_by(id=place.location_id).first()
             place.switches = switches
+            place.location = location
             return place
 
     def get_all_places_and_switches_for_user(self, user_id):
@@ -81,6 +84,8 @@ class PlaceRepositoryService(BaseRepositoryService):
             for place in places:
                 switches = session.query(SwitchModel).filter_by(place_id=place.id).all()
                 place.switches = switches
+                location = session.query(LocationModel).filter_by(id=place.location_id).first()
+                place.location = location
             return places
 
     def delete_place(self, place_name, user_id):

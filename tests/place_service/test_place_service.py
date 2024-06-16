@@ -18,7 +18,7 @@ class TestPlaceService(unittest.TestCase):
 
     def test_store_place_data(self):
         # Setup
-        place_data = PlaceModel(name='test_place', description="test description", user_id='1')
+        place_data = PlaceModel(name='test_place', description="test description", user_id='1', location_id='1')
 
         # Actions
         self.switch_service.store_place_data(place_data)
@@ -28,7 +28,7 @@ class TestPlaceService(unittest.TestCase):
 
     def test_get_place(self):
         # Setup
-        place_data = PlaceModel(name='test_place', description="test description", user_id='1')
+        place_data = PlaceModel(name='test_place', description="test description", user_id='1', location_id='1')
 
         # Actions
         self.switch_service.get_place(place_data.name, place_data.user_id)
@@ -38,7 +38,7 @@ class TestPlaceService(unittest.TestCase):
 
     def test_get_place_and_switches(self):
         # Setup
-        place_data = PlaceModel(name='test_place', description="test description", user_id='1')
+        place_data = PlaceModel(name='test_place', description="test description", user_id='1', location_id='1')
 
         # Actions
         self.switch_service.get_place_and_switches(place_data.name, place_data.user_id)
@@ -58,7 +58,7 @@ class TestPlaceService(unittest.TestCase):
 
     def test_delete_place(self):
         # Setup
-        place_data = PlaceModel(name='test_place', description="test description", user_id='1')
+        place_data = PlaceModel(name='test_place', description="test description", user_id='1', location_id='1')
 
         # Actions
         self.switch_service.delete_place(place_data.name, place_data.user_id)

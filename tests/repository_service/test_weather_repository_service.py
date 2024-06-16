@@ -22,13 +22,13 @@ class TestWeatherRepositoryService(unittest.TestCase):
 
         self.weather_data = [
             WeatherModel(datetime=datetime(2023, 1, 1, 12, 0), cloud_cover=20.5, temperature=25.0, latitude=50.0,
-                         longitude=8.0, sunshine_duration=5.0)
+                         longitude=8.0, sunshine_duration=5.0, location_id=1)
         ]
         self.duplicate_weather_data = [
             WeatherModel(datetime=datetime(2023, 1, 1, 12, 0), cloud_cover=20.5, temperature=25.0, latitude=50.0,
-                         longitude=8.0, sunshine_duration=5.0),
+                         longitude=8.0, sunshine_duration=5.0, location_id=1),
             WeatherModel(datetime=datetime(2023, 1, 1, 12, 0), cloud_cover=20.5, temperature=35.0, latitude=50.0,
-                         longitude=8.0, sunshine_duration=5.0)
+                         longitude=8.0, sunshine_duration=5.0, location_id=1)
         ]
 
     def tearDown(self):

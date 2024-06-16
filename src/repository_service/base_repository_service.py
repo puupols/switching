@@ -11,6 +11,7 @@ from src.switch_service.models.switch_model import SwitchModel
 from src.user_service.models.user_model import UserModel
 from src.weather_service.models.weather_model import WeatherModel
 from src.place_service.models.place_model import PlaceModel
+from src.location_service.models.location_model import LocationModel
 
 
 class BaseRepositoryService:
@@ -33,15 +34,12 @@ class BaseRepositoryService:
 
     def create_database(self):
         """
-        Creates the database and maps the WeatherModel, ElectricityPriceModel and SwitchModel to the respective tables.
+        Creates the database and maps models to the respective tables.
         """
         self.mapper_registry.map_imperatively(WeatherModel, self.tables['weather'])
         self.mapper_registry.map_imperatively(ElectricityPriceModel, self.tables['electricity_price'])
-        self.mapper_registry.map_imperatively(SwitchModel, self.tables['switch'],
-                                              properties={'place': relationship('PlaceModel', back_populates='switch')})
-        self.mapper_registry.map_imperatively(UserModel, self.tables['user'],
-                                              properties={'place': relationship('PlaceModel', back_populates='user', lazy='dynamic')})
-        self.mapper_registry.map_imperatively(PlaceModel, self.tables['place'],
-                                              properties={'user': relationship('UserModel', back_populates='place'),
-                                                          'switch': relationship('SwitchModel', back_populates='place', lazy='dynamic')})
+        self.mapper_registry.map_imperatively(SwitchModel, self.tables['switch'])
+        self.mapper_registry.map_imperatively(LocationModel, self.tables['location'])
+        self.mapper_registry.map_imperatively(UserModel, self.tables['user'])
+        self.mapper_registry.map_imperatively(PlaceModel, self.tables['place'])
         self.metadata.create_all(self.engine)

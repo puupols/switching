@@ -10,10 +10,11 @@ class TestWeatherModel(unittest.TestCase):
         self.temperature = 24
         self.latitude = 52.123
         self.longitude = 24.123
+        self.location_id = 1
         self.sunshine_duration = 3100
 
         # Actions
-        self.weather = WeatherModel(self.datetime, self.cloud_cover, self.temperature, self.latitude, self.longitude, self.sunshine_duration)
+        self.weather = WeatherModel(self.datetime, self.cloud_cover, self.temperature, self.latitude, self.longitude, self.sunshine_duration, self.location_id)
 
         # Asserts
         self.assertEqual(self.weather.datetime, self.datetime)
@@ -21,5 +22,6 @@ class TestWeatherModel(unittest.TestCase):
         self.assertEqual(self.weather.temperature, self.temperature)
         self.assertEqual(self.weather.latitude, self.latitude)
         self.assertEqual(self.weather.longitude, self.longitude)
+        self.assertEqual(self.weather.location_id, self.location_id)
         self.assertEqual(self.weather.sunshine_duration, self.sunshine_duration)
 

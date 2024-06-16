@@ -16,17 +16,22 @@ class TestWeatherTable(TestCase):
         # Asserts
         self.assertIsInstance(created_table, Table)
         self.assertEqual(expected_table_name, created_table.name)
-        self.assertEqual(7, len(created_table.columns))
+        self.assertEqual(8, len(created_table.columns))
         self.assertTrue(created_table.columns['id'].primary_key)
         self.assertTrue(created_table.columns['datetime'].index)
         self.assertTrue(created_table.columns['latitude'].index)
         self.assertTrue(created_table.columns['longitude'].index)
+        self.assertIn('location_id', created_table.columns)
         for constraint in created_table.constraints:
             if constraint.name == 'uix_datetime_lat_long':
                 self.assertEqual(3, len(constraint.columns))
                 self.assertIn('datetime', constraint.columns)
                 self.assertIn('latitude', constraint.columns)
                 self.assertIn('longitude', constraint.columns)
+            elif constraint.name == 'uix_datetime_location_id':
+                self.assertEqual(2, len(constraint.columns))
+                self.assertIn('datetime', constraint.columns)
+                self.assertIn('location_id', constraint.columns)
 
 
 
