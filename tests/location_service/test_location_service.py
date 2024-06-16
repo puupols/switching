@@ -1,20 +1,39 @@
-import unittest
+from unittest import TestCase
 from unittest.mock import Mock
-from src.location_service.configuration_based_location_service import ConfigurationBasedLocationService
+from src.location_service.location_service import LocationService
 
 
-class TestLocationService(unittest.TestCase):
+class TestLocationService(TestCase):
 
     def setUp(self):
-        self.mock_configuration = Mock()
-        self.mock_configuration.get.side_effect = lambda key: {'location_latitude': 555, 'location_longitude': 222}[key]
-        self.mock_location_service = ConfigurationBasedLocationService(self.mock_configuration)
+        self.mock_location_repository_service = Mock()
+        self.location_service = LocationService(location_repository_service=self.mock_location_repository_service)
+
+    def test_store_location_data(self):
+        # Setup
+        mock_location = 'some location'
+
+        # Action
+        self.location_service.store_location_data(mock_location)
+
+        # Asserts
+        self.location_service.location_repository_service.store_location_data.assert_called_once_with(mock_location)
 
     def test_get_location(self):
-        # Action
-        location = self.mock_location_service.get_location()
+        # Setup
+        mock_latitude = 1
+        mock_longitude = 2
 
-        # Assert
-        self.assertEqual(location, (555, 222))
-        self.mock_configuration.get.assert_any_call('location_latitude')
-        self.mock_configuration.get.assert_any_call('location_longitude')
+        # Action
+        self.location_service.get_location(mock_latitude, mock_longitude)
+
+        # Asserts
+        self.location_service.location_repository_service.get_location.assert_called_once_with(mock_latitude,
+                                                                                               mock_longitude)
+
+    def test_get_all_locations(self):
+        # Action
+        self.location_service.get_all_locations()
+
+        # Asserts
+        self.location_service.location_repository_service.get_all_locations.assert_called_once()

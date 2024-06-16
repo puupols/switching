@@ -16,7 +16,7 @@ class OpenMeteoWeatherProcessor(BaseWeatherProcessor):
     """
     OPEN_METEO_DATE_FORMAT = '%Y-%m-%dT%H:%M'
 
-    def process_raw_data(self, raw_data):
+    def process_raw_data(self, raw_data, location_id):
         """
         Processes raw weather data from Open Meteo into WeatherModel instances.
 
@@ -25,6 +25,7 @@ class OpenMeteoWeatherProcessor(BaseWeatherProcessor):
 
         Args:
             raw_data (dict): The raw JSON data received from the Open Meteo API.
+            location_id (int): The ID of the location associated with the weather data.
 
         Returns:
             list[WeatherModel]: A list of WeatherModel instances representing the processed weather data.
@@ -49,7 +50,7 @@ class OpenMeteoWeatherProcessor(BaseWeatherProcessor):
                 cloud_cover = raw_data['hourly']['cloud_cover'][i]
                 temperature = raw_data['hourly']['temperature'][i]
                 sunshine_duration = raw_data['hourly']['sunshine_duration'][i]
-                weather = WeatherModel(date_obj, cloud_cover, temperature, latitude, longitude, sunshine_duration)
+                weather = WeatherModel(date_obj, cloud_cover, temperature, latitude, longitude, sunshine_duration, location_id=location_id)
                 weather_data.append(weather)
             except KeyError as e:
                 self.logger.error(f'KeyError: Missing key {e} in raw_data[hourly] at index {i}')
