@@ -19,9 +19,10 @@ class TestOpenMeteoWeatherProcessor(unittest.TestCase):
         # Setup
         self.data = self._get_data('open_meteo_sample_response.json')
         self.processor = OpenMeteoWeatherProcessor()
+        self.location_id = 1
 
         # Actions
-        processed_data = self.processor.process_raw_data(self.data)
+        processed_data = self.processor.process_raw_data(self.data, self.location_id)
 
         # Asserts
         self.assertEqual(len(processed_data), 24)
@@ -32,14 +33,16 @@ class TestOpenMeteoWeatherProcessor(unittest.TestCase):
         self.assertEqual(processed_data[0].cloud_cover, 41)
         self.assertEqual(processed_data[0].temperature, 11.7)
         self.assertEqual(processed_data[0].sunshine_duration, 0.0)
+        self.assertEqual(processed_data[0].location_id, self.location_id)
 
     def test_process_raw_data_missing_data(self):
         # Setup
         self.data = self._get_data('open_meteo_sample_response_missing_data.json')
         self.processor = OpenMeteoWeatherProcessor()
+        self.location_id = 1
 
         # Actions
-        processed_data = self.processor.process_raw_data(self.data)
+        processed_data = self.processor.process_raw_data(self.data, self.location_id)
 
         # Asserts
         self.assertIsNone(processed_data)

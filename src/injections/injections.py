@@ -8,8 +8,6 @@ from src.electricity_price_service.processors.nordpool_electricity_price_process
 from src.weather_service.api.base_weather_api import BaseWeatherAPI
 from src.weather_service.processors.base_weather_processor import BaseWeatherProcessor
 from src.weather_service.processors.open_meteo_weather_processor import OpenMeteoWeatherProcessor
-from src.location_service.base_location_service import BaseLocationService
-from src.location_service.configuration_based_location_service import ConfigurationBasedLocationService
 from src.weather_service.api.open_meteo_weather_api import OpenMeteoWeatherAPI
 
 
@@ -33,12 +31,6 @@ def app_injection_configuration(binder):
         # Bind configuration instance
         configuration_instance = EnvironmentVariableConfiguration()
         binder.bind(BaseConfiguration, configuration_instance)
-
-        location_service_config = configuration_instance.get('location_service')
-        if location_service_config == 'configuration_file':
-            binder.bind(BaseLocationService, ConfigurationBasedLocationService(configuration_instance))
-        else:
-            raise ValueError(f'Unsupported location service: {location_service_config}')
 
         weather_service_config = configuration_instance.get('weather_service')
         if configuration_instance.get('weather_service') == 'open_meteo':

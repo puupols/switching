@@ -46,3 +46,14 @@ class LocationRepositoryService(BaseRepositoryService):
                 raise ValueError(
                     f"Location with latitude {latitude} and longitude {longitude} does not exist in the database.")
             return location
+
+    def get_all_locations(self):
+        """
+        Retrieves all location data from the database.
+
+        Returns:
+            list[LocationModel]: List of location data.
+        """
+        with self.session_maker() as session:
+            locations = session.query(LocationModel).all()
+            return locations

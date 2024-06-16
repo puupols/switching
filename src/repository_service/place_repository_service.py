@@ -106,5 +106,6 @@ class PlaceRepositoryService(BaseRepositoryService):
             switches = session.query(SwitchModel).filter_by(place_id=place.id).all()
             for switch in switches:
                 session.delete(switch)
+            session.commit()
             session.delete(place)
             session.commit()

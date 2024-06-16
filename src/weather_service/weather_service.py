@@ -1,8 +1,9 @@
 import inject
+import logging
 from src.weather_service.api.base_weather_api import BaseWeatherAPI
 from src.weather_service.processors.base_weather_processor import BaseWeatherProcessor
 from src.repository_service.weather_repository_service import WeatherRepositoryService
-from src.location_service.base_location_service import BaseLocationService
+from src.location_service.location_service import LocationService
 
 
 class WeatherService:
@@ -23,7 +24,7 @@ class WeatherService:
     @inject.autoparams()
     def __init__(self, weather_api: BaseWeatherAPI, weather_processor: BaseWeatherProcessor,
                  repository_service: WeatherRepositoryService,
-                 location_service: BaseLocationService):
+                 location_service: LocationService):
         """
         Initializes the WeatherService with the necessary components for managing weather data.
 
@@ -37,19 +38,35 @@ class WeatherService:
         self.weather_processor = weather_processor
         self.repository_service = repository_service
         self.location_service = location_service
+        self.logger = logging.getLogger(__name__)
 
     def regenerate_weather_data(self):
         """
-        Fetches, processes, and stores current weather data.
-
-        Retrieves the current location, fetches weather data for this location, processes the data, and
-        stores it in the repository. This method is typically used to update the stored weather data with
-        the most recent information.
+        Regenerates weather data for all locations by fetching, processing, and storing new weather data.
         """
-        latitude, longitude = self.location_service.get_location()
-        data = self.weather_api.get_weather_data(latitude, longitude)
-        processed_data = self.weather_processor.process_raw_data(data)
-        self.repository_service.store_weather_data(processed_data)
+        locations = self.location_service.get_all_locations()
+        for location in locations:
+            location_id = location.id
+            latitude = location.latitude
+            longitude = location.longitude
+            self.logger.info(
+                f"Regenerating weather data for location ID {location_id} at coordinates ({latitude}, {longitude}).")
+
+            try:
+                data = self.weather_api.get_weather_data(latitude, longitude)
+                self.logger.debug(f"Received raw weather data for location ID {location_id}: {data}")
+
+                processed_data = self.weather_processor.process_raw_data(data, location_id)
+                self.logger.debug(f"Processed weather data for location ID {location_id}: {processed_data}")
+
+                self.repository_service.store_weather_data(processed_data)
+                self.logger.info(f"Successfully stored weather data for location ID {location_id}.")
+
+            except Exception as e:
+                self.logger.error(
+                    f"Failed to regenerate weather data for location ID {location_id} at coordinates ({latitude}, {longitude}). Error: {e}")
+
+        self.logger.info("Completed the regeneration of weather data for all locations.")
 
     def get_weather_data_after_date(self, date):
         """

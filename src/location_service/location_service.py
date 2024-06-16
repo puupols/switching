@@ -13,3 +13,6 @@ class LocationService:
 
     def get_location(self, latitude, longitude):
         return self.location_repository_service.get_location(latitude, longitude)
+
+    def get_all_locations(self):
+        return self.location_repository_service.get_all_locations()

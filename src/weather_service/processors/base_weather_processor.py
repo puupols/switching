@@ -17,7 +17,7 @@ class BaseWeatherProcessor(ABC):
         self.logger = logging.getLogger(__name__)
 
     @abstractmethod
-    def process_raw_data(self, raw_data):
+    def process_raw_data(self, raw_data, location_id):
         """
         Abstract method to process raw weather data.
 
@@ -26,6 +26,7 @@ class BaseWeatherProcessor(ABC):
 
         Args:
             raw_data: The raw data format specific to the weather data source.
+            location_id: The ID of the location associated with the weather data.
 
         Returns:
             A list or other collection of processed data objects, typically instances of a data model.

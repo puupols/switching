@@ -21,9 +21,8 @@ class WeatherRepositoryService(BaseRepositoryService):
                 try:
                     session.add(weather)
                     session.commit()
-                except IntegrityError as ie:
+                except IntegrityError:
                     session.rollback()
-                    self.logger.error(f"Weather data already exists. Error - {ie}")
                     self._update_weather_data(session, weather)
                 except Exception as e:
                     session.rollback()
