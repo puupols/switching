@@ -4,6 +4,7 @@ from flask import Flask
 from flask_jwt_extended import create_access_token, JWTManager
 from flask_smorest import Api
 from src.place_service.place_service import PlaceService
+from src.location_service.location_service import LocationService
 from src.rest_api.resources.place import Place, Places, blp
 from src.place_service.models.place_model import PlaceModel
 import inject
@@ -28,13 +29,15 @@ class TestPlace(unittest.TestCase):
         self.client = self.app.test_client()
 
         self.mock_place_service = MagicMock()
+        self.mock_location_service = MagicMock()
 
         def configure_injector(binder):
             binder.bind(PlaceService, self.mock_place_service)
+            binder.bind(LocationService, self.mock_location_service)
 
         inject.configure(configure_injector)
 
-        self.place_view = Place(place_service=self.mock_place_service)
+        self.place_view = Place(place_service=self.mock_place_service, location_service=self.mock_location_service)
 
         with self.app.app_context():
             self.access_token = create_access_token(identity=1)
@@ -48,7 +51,8 @@ class TestPlace(unittest.TestCase):
         place_data = {
             "name": "test_place",
             "user_id": 1,
-            "description": "some description"
+            "description": "some description",
+            "location": {"latitude": 1.0, "longitude": 1.0}
         }
 
         mock_jwt_required.return_value = lambda fn: fn
@@ -63,6 +67,9 @@ class TestPlace(unittest.TestCase):
         # Asserts
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json, place_data)
+        self.mock_location_service.store_location_data.assert_called_once()
+        self.mock_location_service.get_location.assert_called_once()
+        self.mock_place_service.store_place_data.assert_called_once()
 
     def test_get_place_success(self):
         # Setup
@@ -70,7 +77,7 @@ class TestPlace(unittest.TestCase):
             "name": "test_place",
             "user_id": 1
         }
-        mock_place = PlaceModel(name="test_place", user_id=1, description="some description")
+        mock_place = PlaceModel(name="test_place", user_id=1, description="some description", location_id=1)
         self.mock_place_service.get_place_and_switches.return_value = mock_place
         headers = {
             'Authorization': f'Bearer {self.access_token}',
@@ -87,7 +94,8 @@ class TestPlace(unittest.TestCase):
             "user_id": 1,
             "description": "some description",
             "id": None,
-            "switches": None
+            "switches": None,
+            "location": None
         })
 
     def test_delete_place_success(self):
@@ -108,197 +116,3 @@ class TestPlace(unittest.TestCase):
         # Asserts
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {'message': 'Place with the name test_place has been deleted.'})
-
-    # @patch('src.rest_api.resources.switch.jwt_required')
-    # def test_post_switch_success(self, mock_jwt_required):
-    #     # Setup
-    #     switch_data = {
-    #         "name": "test_switch",
-    #         "status_calculation_logic": "some logic",
-    #         "place_id": 1
-    #     }
-    #
-    #     mock_jwt_required.return_value = lambda fn: fn
-    #     headers = {
-    #         'Authorization': f'Bearer {self.access_token}',
-    #         'Content-Type': 'application/json'
-    #     }
-    #
-    #     # Actions
-    #     response = self.client.post("/switch", json=switch_data, headers=headers)
-    #
-    #     # Asserts
-    #     self.assertEqual(response.status_code, 201)
-    #     self.assertEqual(response.json, switch_data)
-    #
-    # @patch('src.rest_api.resources.switch.jwt_required')
-    # def test_post_switch_failure(self, mock_jwt_required):
-    #     # Setup
-    #     switch_data = {
-    #         "name": "test_switch",
-    #         "status_calculation_logic": "some logic",
-    #         "place_id": 1
-    #     }
-    #     self.mock_switch_service.store_switch_data.side_effect = Exception("Some error")
-    #     mock_jwt_required.return_value = lambda fn: fn
-    #     headers = {
-    #         'Authorization': f'Bearer {self.access_token}',
-    #         'Content-Type': 'application/json'
-    #     }
-    #
-    #     # Actions
-    #     response = self.client.post("/switch", json=switch_data, headers=headers)
-    #
-    #     # Asserts
-    #     self.assertEqual(response.status_code, 500)
-    #
-    # @patch('src.rest_api.resources.switch.jwt_required')
-    # def test_post_switch_exists(self, mock_jwt_required):
-    #     # Setup
-    #     switch_data = {
-    #         "name": "test_switch",
-    #         "status_calculation_logic": "some logic",
-    #         "place_id": 1
-    #     }
-    #     self.mock_switch_service.store_switch_data.side_effect = ValueError("Switch already exists")
-    #     mock_jwt_required.return_value = lambda fn: fn
-    #     headers = {
-    #         'Authorization': f'Bearer {self.access_token}',
-    #         'Content-Type': 'application/json'
-    #     }
-    #
-    #     # Actions
-    #     response = self.client.post("/switch", json=switch_data, headers=headers)
-    #
-    #     # Asserts
-    #     self.assertEqual(response.status_code, 500)
-    #
-    # @patch('src.rest_api.resources.switch.jwt_required')
-    # def test_put_switch_success(self, mock_jwt_required):
-    #     # Setup
-    #     switch_data = {
-    #         "name": "test_switch",
-    #         "status_calculation_logic": "some logic",
-    #         "place_id": 1
-    #     }
-    #     mock_jwt_required.return_value = lambda fn: fn
-    #     headers = {
-    #         'Authorization': f'Bearer {self.access_token}',
-    #         'Content-Type': 'application/json'
-    #     }
-    #
-    #     # Actions
-    #     response = self.client.put("/switch", json=switch_data, headers=headers)
-    #
-    #     # Asserts
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual(response.json, switch_data)
-    #
-    # @patch('src.rest_api.resources.switch.jwt_required')
-    # def test_put_switch_failure(self, mock_jwt_required):
-    #     # Setup
-    #     switch_data = {
-    #         "name": "test_switch",
-    #         "status_calculation_logic": "some logic",
-    #         "place_id": 1
-    #     }
-    #     self.mock_switch_service.update_switch_data.side_effect = ValueError("Switch not found")
-    #     mock_jwt_required.return_value = lambda fn: fn
-    #     headers = {
-    #         'Authorization': f'Bearer {self.access_token}',
-    #         'Content-Type': 'application/json'
-    #     }
-    #
-    #     # Actions
-    #     response = self.client.put("/switch", json=switch_data, headers=headers)
-    #
-    #     # Asserts
-    #     self.assertEqual(response.status_code, 404)
-    #
-    # @patch('src.rest_api.resources.switch.jwt_required')
-    # def test_get_switch_success(self, mock_jwt_required):
-    #     # Setup
-    #     switch_data = {
-    #         "name": "test_switch",
-    #         "place_id": 1
-    #     }
-    #     mock_switch = SwitchModel(name="test_switch", status_calculation_logic="some logic", place_id=1)
-    #     self.mock_switch_service.get_switch_data.return_value = mock_switch
-    #     mock_jwt_required.return_value = lambda fn: fn
-    #     headers = {
-    #         'Authorization': f'Bearer {self.access_token}',
-    #         'Content-Type': 'application/json'
-    #     }
-    #
-    #     # Actions
-    #     response = self.client.get("/switch", json=switch_data, headers=headers)
-    #
-    #     # Asserts
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual(response.json, {
-    #         "name": "test_switch",
-    #         'status': None,
-    #         "status_calculation_logic": "some logic",
-    #         "place_id": 1
-    #     })
-    #
-    # @patch('src.rest_api.resources.switch.jwt_required')
-    # def test_get_switch_failure(self, mock_jwt_required):
-    #     # Setup
-    #     switch_data = {
-    #         "name": "test_switch",
-    #         "place_id": 1
-    #     }
-    #     self.mock_switch_service.get_switch_data.side_effect = ValueError("Switch not found")
-    #     mock_jwt_required.return_value = lambda fn: fn
-    #     headers = {
-    #         'Authorization': f'Bearer {self.access_token}',
-    #         'Content-Type': 'application/json'
-    #     }
-    #
-    #     # Actions
-    #     response = self.client.get("/switch", json=switch_data, headers=headers)
-    #
-    #     # Asserts
-    #     self.assertEqual(response.status_code, 404)
-    #
-    # @patch('src.rest_api.resources.switch.jwt_required')
-    # def test_delete_switch_success(self, mock_jwt_required):
-    #     # Setup
-    #     switch_data = {
-    #         "name": "test_switch",
-    #         "place_id": 1
-    #     }
-    #     mock_jwt_required.return_value = lambda fn: fn
-    #     headers = {
-    #         'Authorization': f'Bearer {self.access_token}',
-    #         'Content-Type': 'application/json'
-    #     }
-    #     self.mock_switch_service.delete_switch.return_value = None
-    #
-    #     # Actions
-    #     response = self.client.delete("/switch", json=switch_data, headers=headers)
-    #
-    #     # Asserts
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual(response.json, switch_data)
-    #
-    # @patch('src.rest_api.resources.switch.jwt_required')
-    # def test_delete_switch_failure(self, mock_jwt_required):
-    #     # Setup
-    #     switch_data = {
-    #         "name": "test_switch",
-    #         "place_id": 1
-    #     }
-    #     mock_jwt_required.return_value = lambda fn: fn
-    #     headers = {
-    #         'Authorization': f'Bearer {self.access_token}',
-    #         'Content-Type': 'application/json'
-    #     }
-    #     self.mock_switch_service.delete_switch.side_effect = ValueError("Switch not found")
-    #
-    #     # Actions
-    #     response = self.client.delete("/switch", json=switch_data, headers=headers)
-    #
-    #     # Asserts
-    #     self.assertEqual(response.status_code, 404)

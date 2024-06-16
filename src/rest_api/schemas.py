@@ -35,11 +35,18 @@ class UserGetSchema(Schema):
     user_name = fields.Str(required=True)
 
 
+class LocationSchema(Schema):
+    id = fields.Int(dump_only=True)
+    latitude = fields.Float(required=True)
+    longitude = fields.Float(required=True)
+
+
 class PlaceSchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.Str(required=True)
     description = fields.Str(required=True)
     user_id = fields.Int(required=True)
+    location = fields.Nested(LocationSchema(), required=True)
 
 
 class PlaceGetSchema(Schema):
