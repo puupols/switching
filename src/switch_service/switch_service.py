@@ -46,41 +46,41 @@ class SwitchService:
                 'get_weather_data_after_date': self.weather_service.get_weather_data_after_date,
                 'get_electricity_price_data_after_date': self.electricity_price_service.get_electricity_price_data_after_date}
 
-    def _get_switch_status_calculation_logic(self, switch_name):
+    def _get_switch_status_calculation_logic(self, switch_uuid):
         """
         Gets the status calculation logic from the database for the switch with the given name.
 
         Arguments:
-            switch_name (str): The name of the switch.
+            switch_uuid (str): The uuid of the switch.
 
         Returns:
             str: The status calculation logic for the switch.
         """
         try:
-            switch = self.repository_service.get_switch(switch_name)
+            switch = self.repository_service.get_switch(switch_uuid)
             if switch:
                 return switch.status_calculation_logic
             else:
                 return None
         except Exception as e:
-            self.logger.error(f"Error getting switch status calculation logic for switch {switch_name}. The exception: {e}")
+            self.logger.error(f"Error getting switch status calculation logic for switch {switch_uuid}. The exception: {e}")
             return None
 
-    def get_switch_status(self, switch_name):
+    def get_switch_status(self, switch_uuid):
         """
         Calculates the status of the switch with the given name based on the status calculation logic defined in the switch data.
 
         Arguments:
-            switch_name (str): The name of the switch.
+            switch_uuid (str): The uuid of the switch.
 
         Returns:
             str: The status of the switch.
         """
         global_scope = self._get_allowed_scope()
-        switch_status_calculation_logic = self._get_switch_status_calculation_logic(switch_name)
+        switch_status_calculation_logic = self._get_switch_status_calculation_logic(switch_uuid)
 
         if switch_status_calculation_logic is None:
-            self.logger.error(f"Switch calculation logic not found for switch {switch_name}.")
+            self.logger.error(f"Switch calculation logic not found for switch {switch_uuid}.")
             switch_status = SwitchModel.SWITCH_VALUE_IF_SWITCH_NOT_IMPLEMENTED
         else:
             try:
@@ -88,7 +88,7 @@ class SwitchService:
                 get_switch_status = global_scope["get_switch_status"]
                 switch_status = get_switch_status()
             except Exception as e:
-                self.logger.error(f"Error calculating switch status for switch {switch_name}. The exception: {e}")
+                self.logger.error(f"Error calculating switch status for switch {switch_uuid}. The exception: {e}")
                 switch_status = SwitchModel.SWITCH_VALUE_IF_ERROR_OCCURRED
 
         return switch_status
@@ -111,23 +111,23 @@ class SwitchService:
         """
         self.repository_service.update_switch_data(switch)
 
-    def get_switch_data(self, switch_name):
+    def get_switch_data(self, switch_uuid):
         """
         Retrieves the switch data from the database.
 
         Arguments:
-            switch_name (str): The name of the switch.
+            switch_uuid (str): The uuid of the switch.
 
         Returns:
             SwitchModel: The switch data.
         """
-        return self.repository_service.get_switch(switch_name)
+        return self.repository_service.get_switch(switch_uuid)
 
-    def delete_switch(self, switch_name):
+    def delete_switch(self, switch_uuid):
         """
         Deletes the switch data from the database.
 
         Arguments:
-            switch_name (str): The name of the switch.
+            switch_uuid (str): The uuid of the switch.
         """
-        self.repository_service.delete_switch(switch_name)
+        self.repository_service.delete_switch(switch_uuid)
