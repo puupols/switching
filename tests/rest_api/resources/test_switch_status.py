@@ -42,13 +42,11 @@ class TestSwitchStatus(unittest.TestCase):
     def tearDown(self):
         inject.clear()
 
-    @patch('src.rest_api.resources.switch_status.SwitchStatusRetrivalSchema')
     @patch('src.rest_api.resources.switch_status.jwt_required')
-    def test_get_switch_status_success(self, mock_jwt_required, mock_schema):
+    def test_get_switch_status_success(self, mock_jwt_required):
         # Setup
         mock_jwt_required.return_value = lambda fn: fn
         self.mock_switch_service.get_switch_status.return_value = "ON"
-        mock_schema.return_value.load.return_value = {"name": "test_switch", "place_id": 1}
 
         headers = {
             'Authorization': f'Bearer {self.access_token}',
@@ -57,12 +55,12 @@ class TestSwitchStatus(unittest.TestCase):
 
         # Actions
         with self.app.app_context():
-            response = self.client.get("/switch/status", json={"name": "test_switch", "place_id": 1}, headers=headers)
+            response = self.client.get("/switch/status", json={"uuid": "uuid_1"}, headers=headers)
 
         # Asserts
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
-            "name": "test_switch",
+            "uuid": "uuid_1",
             "status": "ON"
         })
 
@@ -72,7 +70,7 @@ class TestSwitchStatus(unittest.TestCase):
         # Setup
         mock_jwt_required.return_value = lambda fn: fn
         self.mock_switch_service.get_switch_status.return_value = SwitchModel.SWITCH_VALUE_IF_ERROR_OCCURRED
-        mock_schema.return_value.load.return_value = {"name": "test_switch", "place_id": 1}
+        mock_schema.return_value.load.return_value = {"uuid": "uuid_1"}
 
         headers = {
             'Authorization': f'Bearer {self.access_token}',
@@ -81,8 +79,8 @@ class TestSwitchStatus(unittest.TestCase):
 
         # Actions
         with self.app.app_context():
-            response = self.client.get("/switch/status", json={"name": "test_switch", "place_id": 1}, headers=headers)
+            response = self.client.get("/switch/status", json={"uuid": "uuid_1"}, headers=headers)
 
         # Asserts
         self.assertEqual(response.status_code, 500)
-        self.assertIn("Could not process request for the switch with name test_switch", response.json["message"])
+        self.assertIn("Could not process request for the switch with uuid uuid_1", response.json["message"])

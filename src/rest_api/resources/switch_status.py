@@ -37,17 +37,17 @@ class SwitchStatus(MethodView):
         Returns:
             dict: Dictionary containing the name of the switch and its status.
         """
-        switch_name = switch_data["name"]
-        switch_status = self.switch_service.get_switch_status(switch_name)
+        switch_uuid = switch_data["uuid"]
+        switch_status = self.switch_service.get_switch_status(switch_uuid)
 
         if switch_status == SwitchModel.SWITCH_VALUE_IF_ERROR_OCCURRED:
-            abort(500, message=f"Could not process request for the switch with name {switch_name}. "
+            abort(500, message=f"Could not process request for the switch with uuid {switch_uuid}. "
                                f"Please check switch status calculation logic")
         if switch_status == SwitchModel.SWITCH_VALUE_IF_SWITCH_NOT_IMPLEMENTED:
-            abort(500, message=f"Could not process request for the switch with name {switch_name}. "
+            abort(500, message=f"Could not process request for the switch with uuid {switch_uuid}. "
                                f"Switch not defined or calculation logic not set")
 
-        response = {"name": switch_name,
+        response = {"uuid": switch_uuid,
                     "status": switch_status}
         self.logger.info(f'Returned response: {response}')
         return response

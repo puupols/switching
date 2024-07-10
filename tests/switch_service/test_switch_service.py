@@ -73,7 +73,7 @@ class TestSwitchService(unittest.TestCase):
 
     def test_store_switch_data(self):
         # Setup
-        switch_data = SwitchModel(name='test_switch', place_id='1', status_calculation_logic='mock_logic')
+        switch_data = SwitchModel(name='test_switch', uuid="uuid_1", place_id='1', status_calculation_logic='mock_logic')
 
         # Actions
         self.switch_service.store_switch_data(switch_data)
@@ -83,7 +83,7 @@ class TestSwitchService(unittest.TestCase):
 
     def test_update_switch_data(self):
         # Setup
-        switch_data = SwitchModel(name='test_switch', place_id='1', status_calculation_logic='mock_logic')
+        switch_data = SwitchModel(name='test_switch', uuid="uuid_1", place_id='1', status_calculation_logic='mock_logic')
 
         # Actions
         self.switch_service.update_switch_data(switch_data)

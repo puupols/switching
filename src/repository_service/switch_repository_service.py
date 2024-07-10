@@ -41,18 +41,20 @@ class SwitchRepositoryService(BaseRepositoryService):
         try:
             with self.session_maker() as session:
                 try:
-                    existing_switch = self.get_switch(switch.name)
+                    existing_switch = self.get_switch(switch.uuid)
                 except ValueError as ve:
                     self.logger.error(f"ValueError in get_switch: {ve}")
                     raise ve
                 existing_switch.status_calculation_logic = switch.status_calculation_logic
+                existing_switch.name = switch.name
+                existing_switch.place_id = switch.place_id
                 session.add(existing_switch)
                 session.commit()
         except Exception as e:
             self.logger.error(f"Error updating switch data into database. Error = {e}")
             raise e
 
-    def get_switch(self, name):
+    def get_switch(self, uuid):
         """
         Retrieves a switch object from the database based on the switch name.
 
@@ -63,13 +65,13 @@ class SwitchRepositoryService(BaseRepositoryService):
             SwitchModel: SwitchModel object retrieved from the database. ValueError is raised if the switch does not exist.
         """
         with self.session_maker() as session:
-            existing_switch = session.query(SwitchModel).filter(SwitchModel.name == name).first()
+            existing_switch = session.query(SwitchModel).filter(SwitchModel.uuid == uuid).first()
             if existing_switch:
                 return existing_switch
             else:
-                raise ValueError(f"Switch with name {name} does not exist in the database.")
+                raise ValueError(f"Switch with uuid {uuid} does not exist in the database.")
 
-    def delete_switch(self, name):
+    def delete_switch(self, uuid):
         """
         Deletes a switch object from the database.
 
@@ -81,7 +83,7 @@ class SwitchRepositoryService(BaseRepositoryService):
         """
         try:
             with self.session_maker() as session:
-                existing_switch = self.get_switch(name)
+                existing_switch = self.get_switch(uuid)
                 session.delete(existing_switch)
                 session.commit()
         except ValueError as ve:

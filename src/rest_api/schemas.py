@@ -2,21 +2,20 @@ from marshmallow import Schema, fields
 
 
 class SwitchStatusRetrivalSchema(Schema):
-    name = fields.Str(required=True)
-    place_id = fields.Int(required=True)
+    uuid = fields.Str(required=True)
     status = fields.Str(dump_only=True)
 
 
 class SwitchSchema(Schema):
     name = fields.Str(required=True)
+    uuid = fields.Str(required=True)
     place_id = fields.Int(required=True)
     status = fields.Str(dump_only=True)
     status_calculation_logic = fields.Str(required=True)
 
 
 class SwitchGetSchema(Schema):
-    name = fields.Str(required=True)
-    place_id = fields.Int(required=True)
+    uuid = fields.Str(required=True)
 
 
 class UserSchema(Schema):
