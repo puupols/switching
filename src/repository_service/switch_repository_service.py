@@ -59,7 +59,7 @@ class SwitchRepositoryService(BaseRepositoryService):
         Retrieves a switch object from the database based on the switch name.
 
         Args:
-            name (str): The name of the switch to be retrieved.
+            uuid (str): The uuid of the switch to be retrieved.
 
         Returns:
             SwitchModel: SwitchModel object retrieved from the database. ValueError is raised if the switch does not exist.
@@ -76,7 +76,7 @@ class SwitchRepositoryService(BaseRepositoryService):
         Deletes a switch object from the database.
 
         Args:
-            name (str): The name of the switch to be deleted.
+            uuid (str): The uuid of the switch to be deleted.
 
         Returns:
             None, raises a ValueError if the switch does not exist in the database.
