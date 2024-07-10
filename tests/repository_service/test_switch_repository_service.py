@@ -22,7 +22,7 @@ class TestRepositoryService(unittest.TestCase):
 
     def test_store_switch_data(self):
         # Setup
-        switch = SwitchModel(name="Switch 1", place_id='1', status_calculation_logic="status_calculation_logic")
+        switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="status_calculation_logic")
         expected_name = switch.name
         # Actions
         self.switch_repository_service.store_switch_data(switch)
@@ -35,8 +35,8 @@ class TestRepositoryService(unittest.TestCase):
 
     def test_store_switch_data_if_already_exists(self):
         # Setup
-        switch = SwitchModel(name="Switch 1", place_id='1', status_calculation_logic="status_calculation_logic")
-        duplicate_switch = SwitchModel(name="Switch 1", place_id='1', status_calculation_logic="new_status_calculation_logic")
+        switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="status_calculation_logic")
+        duplicate_switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="new_status_calculation_logic")
 
         # Actions
         self.switch_repository_service.store_switch_data(switch)
@@ -47,21 +47,21 @@ class TestRepositoryService(unittest.TestCase):
 
     def test_update_switch_data(self):
         # Setup
-        switch = SwitchModel(name="Switch 1", place_id='1', status_calculation_logic="status_calculation_logic")
-        updated_switch = SwitchModel(name="Switch 1", place_id='1', status_calculation_logic="new_status_calculation_logic")
+        switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="status_calculation_logic")
+        updated_switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="new_status_calculation_logic")
 
         # Actions
         self.switch_repository_service.store_switch_data(switch)
         self.switch_repository_service.update_switch_data(updated_switch)
-        changed_switch = self.switch_repository_service.get_switch("Switch 1")
+        changed_switch = self.switch_repository_service.get_switch("uuid_1")
 
         # Asserts
         self.assertEqual(changed_switch.status_calculation_logic, "new_status_calculation_logic")
 
     def test_update_switch_data_if_not_exists(self):
         # Setup
-        switch = SwitchModel(name="Switch 1", place_id='1', status_calculation_logic="status_calculation_logic")
-        updated_switch = SwitchModel(name="Switch 2", place_id='1', status_calculation_logic="new_status_calculation_logic")
+        switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="status_calculation_logic")
+        updated_switch = SwitchModel(name="Switch 2", uuid='uuid_2', place_id='1', status_calculation_logic="new_status_calculation_logic")
 
         # Actions
         self.switch_repository_service.store_switch_data(switch)
@@ -72,23 +72,23 @@ class TestRepositoryService(unittest.TestCase):
 
     def test_get_switch(self):
         # Setup
-        switch = SwitchModel(name="Switch 1", place_id='1', status_calculation_logic="status_calculation_logic")
+        switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="status_calculation_logic")
         expected_name = switch.name
 
         # Actions
         self.switch_repository_service.store_switch_data(switch)
-        result = self.switch_repository_service.get_switch("Switch 1")
+        result = self.switch_repository_service.get_switch("uuid_1")
 
         # Asserts
         self.assertEqual(result.name, expected_name)
 
     def test_get_switch_if_not_exists(self):
         # Setup
-        switch = SwitchModel(name="Switch 1", place_id='1', status_calculation_logic="status_calculation_logic")
+        switch = SwitchModel(name="Switch 1", uuid="uuid_1", place_id='1', status_calculation_logic="status_calculation_logic")
 
         # Actions
         self.switch_repository_service.store_switch_data(switch)
 
         # Asserts
         with self.assertRaises(ValueError):
-            self.switch_repository_service.get_switch("Switch 2")
+            self.switch_repository_service.get_switch("uuid_2")
