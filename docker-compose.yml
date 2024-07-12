@@ -12,7 +12,8 @@ services:
     environment:
       - PYTHONPATH=/usr/src/app
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
         - switching-network
     command: ["gunicorn", "-b", "0.0.0.0:5000", "src.app:create_app()"]
@@ -45,6 +46,11 @@ services:
       - switching-network
     ports:
       - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   switching-network:
