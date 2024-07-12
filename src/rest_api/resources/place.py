@@ -78,7 +78,7 @@ class Place(MethodView):
         Retrieves the place data from the database.
 
         Arguments:
-            place_data (dict): Dictionary containing the place name and user id.
+            place_data (dict): Dictionary containing the place id and user id.
 
         Returns:
             dict: Dictionary containing the place data.
@@ -86,18 +86,18 @@ class Place(MethodView):
             Error 500: If an error occurred while getting place data.
             Error 401: If the user is not authorized to get the place data.
         """
-        place_name = place_data["name"]
+        place_id = place_data["place_id"]
         user_id = place_data["user_id"]
         if user_id != get_jwt_identity():
-            self.logger.error(f"User {get_jwt_identity()} is not authorized to get place {place_name}")
+            self.logger.error(f"User {get_jwt_identity()} is not authorized to get place {place_id}")
             abort(401, message="You are not authorized to get this place.")
         try:
-            place = self.place_service.get_place_and_switches(place_name, user_id)
+            place = self.place_service.get_place_and_switches(place_id, user_id)
         except ValueError:
-            self.logger.error(f"Error getting place data from the database for the place name {place_name}.")
-            abort(404, message=f"Place with the name {place_name} not found.")
+            self.logger.error(f"Error getting place data from the database for the place id {place_id}.")
+            abort(404, message=f"Place with the id {place_id} not found.")
         except Exception as e:
-            self.logger.error(f"Error getting place data from the database for the place name {place_name}. Error = {e}")
+            self.logger.error(f"Error getting place data from the database for the place id {place_id}. Error = {e}")
             abort(500, message="An error occurred while getting place data.")
         return place
 
@@ -108,7 +108,7 @@ class Place(MethodView):
         Deletes the place data from the database.
 
         Arguments:
-            place_data (dict): Dictionary containing the place name and user id.
+            place_data (dict): Dictionary containing the place id and user id.
 
         Returns:
             dict: Dictionary containing the message.
@@ -116,19 +116,19 @@ class Place(MethodView):
             Error 500: If an error occurred while deleting place data.
             Error 401: If the user is not authorized to delete the place data.
         """
-        place_name = place_data["name"]
+        place_id = place_data["place_id"]
         user_id = place_data["user_id"]
         if user_id != get_jwt_identity():
-            self.logger.error(f"User {get_jwt_identity()} is not authorized to delete place {place_name}")
+            self.logger.error(f"User {get_jwt_identity()} is not authorized to delete place {place_id}")
             abort(401, message="You are not authorized to delete this place.")
         try:
-            self.place_service.delete_place(place_name, user_id)
-            return {"message": f"Place with the name {place_name} has been deleted."}, 200
+            self.place_service.delete_place(place_id, user_id)
+            return {"message": f"Place with the id {place_id} has been deleted."}, 200
         except ValueError:
-            self.logger.error(f"Error deleting place data from the database for the place name {place_name}.")
-            abort(404, message=f"Place with the name {place_name} not found.")
+            self.logger.error(f"Error deleting place data from the database for the place id {place_id}.")
+            abort(404, message=f"Place with the id {place_id} not found.")
         except Exception as e:
-            self.logger.error(f"Error deleting place data from the database for the place name {place_name}. Error = {e}")
+            self.logger.error(f"Error deleting place data from the database for the place id {place_id}. Error = {e}")
             abort(500, message="An error occurred while deleting place data.")
 
 

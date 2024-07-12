@@ -49,7 +49,7 @@ class PlaceSchema(Schema):
 
 
 class PlaceGetSchema(Schema):
-    name = fields.Str(required=True)
+    place_id = fields.Int(required=True)
     user_id = fields.Int(required=True)
 
 
