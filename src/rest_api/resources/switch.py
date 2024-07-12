@@ -76,7 +76,8 @@ class Switch(MethodView):
         """
         try:
             switch = SwitchModel(**switch_data)
-            self.switch_service.update_switch_data(switch)
+            user_id = get_jwt_identity()
+            self.switch_service.update_switch_data(switch, user_id)
         except ValueError as e:
             self.logger.error(f"Error updating switch data in the database. Error = {e}")
             abort(404, message="Switch not found.")
@@ -101,8 +102,9 @@ class Switch(MethodView):
             Error 500: If an error occurred while getting switch data.
         """
         switch_uuid = switch_data["uuid"]
+        user_id = get_jwt_identity()
         try:
-            switch = self.switch_service.get_switch_data(switch_uuid)
+            switch = self.switch_service.get_switch_data_for_user(switch_uuid, user_id)
         except ValueError as e:
             self.logger.error(f"Error getting switch data from the database for the switch uuid {switch_uuid}. Error = {e}")
             abort(404, message=f"Switch with the uuid {switch_uuid} not found.")
@@ -127,8 +129,9 @@ class Switch(MethodView):
             Error 500: If an error occurred while deleting switch data.
         """
         switch_uuid = switch_data["uuid"]
+        user_id = get_jwt_identity()
         try:
-            self.switch_service.delete_switch(switch_uuid)
+            self.switch_service.delete_switch(switch_uuid, user_id)
         except ValueError as e:
             self.logger.error(f"Error deleting switch data from the database for the switch uuid {switch_uuid}. Error = {e}")
             abort(404, message=f"Switch with the uuid {switch_uuid} not found.")
@@ -136,5 +139,3 @@ class Switch(MethodView):
             self.logger.error(f"Error deleting switch data from the database for the switch uuid {switch_uuid}. Error = {e}")
             abort(500, message="An error occurred while deleting switch data.")
         return switch_data
-
-

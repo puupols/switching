@@ -38,7 +38,8 @@ class SwitchStatus(MethodView):
             dict: Dictionary containing the name of the switch and its status.
         """
         switch_uuid = switch_data["uuid"]
-        switch_status = self.switch_service.get_switch_status(switch_uuid)
+        user_id = get_jwt_identity()
+        switch_status = self.switch_service.get_switch_status(switch_uuid, user_id)
 
         if switch_status == SwitchModel.SWITCH_VALUE_IF_ERROR_OCCURRED:
             abort(500, message=f"Could not process request for the switch with uuid {switch_uuid}. "
