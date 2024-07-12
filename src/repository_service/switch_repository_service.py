@@ -1,6 +1,7 @@
 from sqlalchemy.exc import IntegrityError
 from src.repository_service.base_repository_service import BaseRepositoryService
 from src.switch_service.models.switch_model import SwitchModel
+from src.switch_service.models.switch_data_model import SwitchDataModel
 from src.place_service.models.place_model import PlaceModel
 
 
@@ -79,7 +80,7 @@ class SwitchRepositoryService(BaseRepositoryService):
 
         Args:
             uuid (str): The uuid of the switch to be retrieved.
-            user_id (str): The user id of the user who owns the switch.
+            user_id (int): The user id of the user who owns the switch.
 
         Returns:
             SwitchModel: SwitchModel object retrieved from the database. ValueError is raised if the switch does not exist.
@@ -115,3 +116,23 @@ class SwitchRepositoryService(BaseRepositoryService):
         except Exception as e:
             self.logger.error(f"Error deleting switch data from database. Error = {e}")
             raise e
+
+    def store_switch_operational_data(self, switch_data):
+        """
+        Stores a switch operational data object into the database.
+
+        Args: switch_data (SwitchDataModel): SwitchDataModel object to be stored in the database.
+
+        Returns:
+            None, raises an IntegrityError if the switch data already exists in the database.
+        """
+        try:
+            with self.session_maker() as session:
+                session.add(switch_data)
+                session.commit()
+        except IntegrityError:
+            self.logger.error(f"Switch data with timestamp {switch_data.timestamp} already exists in the database.")
+            raise
+        except Exception as e:
+            self.logger.error(f"Error storing switch data into database. Error = {e}")
+            raise

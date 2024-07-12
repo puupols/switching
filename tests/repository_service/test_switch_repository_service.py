@@ -1,3 +1,4 @@
+import datetime
 import unittest
 from unittest.mock import MagicMock
 from sqlalchemy.orm import clear_mappers
@@ -6,6 +7,8 @@ from src.configuration.base_configuration import BaseConfiguration
 from src.repository_service.switch_repository_service import SwitchRepositoryService
 from src.switch_service.models.switch_model import SwitchModel
 from src.place_service.models.place_model import PlaceModel
+from src.switch_service.models.switch_data_model import SwitchDataType
+from src.switch_service.models.switch_data_model import SwitchDataModel
 
 
 class TestRepositoryService(unittest.TestCase):
@@ -131,3 +134,20 @@ class TestRepositoryService(unittest.TestCase):
         # Asserts
         with self.assertRaises(ValueError):
             self.switch_repository_service.get_switch("uuid_2")
+
+    def test_store_switch_operational_data(self):
+        # Setup
+        switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="status_calculation_logic")
+        switch_data = SwitchDataModel(switch_id=1, data_type=SwitchDataType.RELAY_STATUS, log_cre_date=datetime.datetime.now(), value_text="ON")
+        expected_value_text = switch_data.value_text
+
+        # Actions
+        self.switch_repository_service.store_switch_data(switch)
+        self.switch_repository_service.store_switch_operational_data(switch_data)
+        with self.switch_repository_service.session_maker() as session:
+            stored_data = session.query(SwitchDataModel).all()
+
+        # Asserts
+        self.assertEqual(len(stored_data), 1)
+        self.assertEqual(stored_data[0].value_text, expected_value_text)
+
