@@ -2,7 +2,7 @@ import logging
 
 import inject
 from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import sessionmaker, registry, relationship
+from sqlalchemy.orm import sessionmaker, registry
 
 from src.configuration.base_configuration import BaseConfiguration
 from src.electricity_price_service.models.electricity_price_model import ElectricityPriceModel
@@ -12,6 +12,7 @@ from src.user_service.models.user_model import UserModel
 from src.weather_service.models.weather_model import WeatherModel
 from src.place_service.models.place_model import PlaceModel
 from src.location_service.models.location_model import LocationModel
+from src.switch_service.models.switch_data_model import SwitchDataModel
 
 
 class BaseRepositoryService:
@@ -42,4 +43,5 @@ class BaseRepositoryService:
         self.mapper_registry.map_imperatively(LocationModel, self.tables['location'])
         self.mapper_registry.map_imperatively(UserModel, self.tables['user'])
         self.mapper_registry.map_imperatively(PlaceModel, self.tables['place'])
+        self.mapper_registry.map_imperatively(SwitchDataModel, self.tables['switch_data'])
         self.metadata.create_all(self.engine)

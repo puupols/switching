@@ -3,9 +3,11 @@ from src.weather_service.weather_service import WeatherService
 from src.electricity_price_service.electricity_price_service import ElectricityPriceService
 from src.repository_service.switch_repository_service import SwitchRepositoryService
 from src.switch_service.models.switch_model import SwitchModel
+from src.switch_service.models.switch_data_model import SwitchDataModel
+from src.switch_service.models.switch_data_model import SwitchDataType
+from datetime import datetime
 import inject
 import logging
-import datetime
 
 
 class SwitchService:
@@ -46,26 +48,39 @@ class SwitchService:
                 'get_weather_data_after_date': self.weather_service.get_weather_data_after_date,
                 'get_electricity_price_data_after_date': self.electricity_price_service.get_electricity_price_data_after_date}
 
-    def _get_switch_status_calculation_logic(self, switch_uuid, user_id):
+    def _fetch_switch(self, switch_uuid, user_id):
         """
-        Gets the status calculation logic from the database for the switch with the given uuid.
+        Fetches the switch model from the repository service for a given switch UUID and user ID.
 
         Arguments:
             switch_uuid (str): The uuid of the switch.
-            user_id (str): The id of the user.
+            user_id (int): The id of the user.
 
         Returns:
-            str: The status calculation logic for the switch.
+            SwitchModel: The switch model.
         """
         try:
-            switch = self.repository_service.get_switch_for_user(switch_uuid, user_id)
-            if switch:
-                return switch.status_calculation_logic
-            else:
-                return None
+            return self.repository_service.get_switch_for_user(switch_uuid, user_id)
         except Exception as e:
-            self.logger.error(f"Error getting switch status calculation logic for switch {switch_uuid}. The exception: {e}")
+            self.logger.error(
+                f"Error fetching switch for switch_uuid {switch_uuid}, user_id {user_id}. The exception: {e}")
             return None
+
+    def _store_switch_status(self, switch, switch_status):
+        """
+        Stores the status of the switch with the given uuid in the database.
+
+        Arguments:
+            switch (SwitchModel): The switch object.
+            switch_status (str): The status of the switch.
+        """
+        try:
+            switch_data = SwitchDataModel(switch_id=switch.id, data_type=SwitchDataType.RELAY_STATUS,
+                                          log_cre_date=datetime.now(), value_text=switch_status)
+            self.store_switch_operational_data(switch_data)
+        except Exception as e:
+            self.logger.error(
+                f"Error storing switch operational data into database for switch uuid {switch.uuid}, exception: {e}")
 
     def get_switch_status(self, switch_uuid, user_id):
         """
@@ -73,13 +88,14 @@ class SwitchService:
 
         Arguments:
             switch_uuid (str): The uuid of the switch.
-            user_id (str): The id of the user.
+            user_id (int): The id of the user.
 
         Returns:
             str: The status of the switch.
         """
         global_scope = self._get_allowed_scope()
-        switch_status_calculation_logic = self._get_switch_status_calculation_logic(switch_uuid, user_id)
+        switch = self._fetch_switch(switch_uuid, user_id)
+        switch_status_calculation_logic = switch.status_calculation_logic if switch else None
 
         if switch_status_calculation_logic is None:
             self.logger.error(f"Switch calculation logic not found for switch {switch_uuid}.")
@@ -93,6 +109,8 @@ class SwitchService:
                 self.logger.error(f"Error calculating switch status for switch {switch_uuid}. The exception: {e}")
                 switch_status = SwitchModel.SWITCH_VALUE_IF_ERROR_OCCURRED
 
+        if switch:
+            self._store_switch_status(switch, switch_status)
         return switch_status
 
     def store_switch_data(self, switch):
@@ -148,3 +166,9 @@ class SwitchService:
             user_id (str): The id of the user.
         """
         self.repository_service.delete_switch(switch_uuid, user_id)
+
+    def store_switch_operational_data(self, switch_data):
+        """
+        Stores a switch operational data object into the database.
+        """
+        self.repository_service.store_switch_operational_data(switch_data)
