@@ -159,7 +159,7 @@ class TestSwitch(unittest.TestCase):
             "uuid": "uuid_1"
         }
         mock_switch = SwitchModel(name="test_switch", uuid="uuid_1", status_calculation_logic="some logic", place_id=1)
-        self.mock_switch_service.get_switch_data.return_value = mock_switch
+        self.mock_switch_service.get_switch_data_for_user.return_value = mock_switch
         mock_jwt_required.return_value = lambda fn: fn
         headers = {
             'Authorization': f'Bearer {self.access_token}',
@@ -185,7 +185,7 @@ class TestSwitch(unittest.TestCase):
         switch_data = {
             "uuid": "uuid_1"
         }
-        self.mock_switch_service.get_switch_data.side_effect = ValueError("Switch not found")
+        self.mock_switch_service.get_switch_data_for_user.side_effect = ValueError("Switch not found")
         mock_jwt_required.return_value = lambda fn: fn
         headers = {
             'Authorization': f'Bearer {self.access_token}',

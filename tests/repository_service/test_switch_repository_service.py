@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from src.configuration.base_configuration import BaseConfiguration
 from src.repository_service.switch_repository_service import SwitchRepositoryService
 from src.switch_service.models.switch_model import SwitchModel
+from src.place_service.models.place_model import PlaceModel
 
 
 class TestRepositoryService(unittest.TestCase):
@@ -14,11 +15,37 @@ class TestRepositoryService(unittest.TestCase):
         self.mock_configuration.get.return_value = "sqlite:///:memory:"
         self.switch_repository_service = SwitchRepositoryService(configuration=self.mock_configuration)
         self.switch_repository_service.create_database()
+        self.place = PlaceModel(user_id=1, name="Place 1", description="Description 1", location_id=1, id=1)
+        with self.switch_repository_service.session_maker() as session:
+            session.add(self.place)
+            session.commit()
 
     def tearDown(self):
         self.switch_repository_service.metadata.drop_all(self.switch_repository_service.engine)
         clear_mappers()
         self.switch_repository_service.engine.dispose()
+
+    def test_get_switch_for_user(self):
+        # Setup
+        switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="status_calculation_logic")
+        expected_name = switch.name
+        # Actions
+        self.switch_repository_service.store_switch_data(switch)
+        result = self.switch_repository_service.get_switch_for_user("uuid_1", 1)
+
+        # Asserts
+        self.assertEqual(result.name, expected_name)
+
+    def test_get_switch_for_user_if_not_exists(self):
+        # Setup
+        switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="status_calculation_logic")
+
+        # Actions
+        self.switch_repository_service.store_switch_data(switch)
+
+        # Asserts
+        with self.assertRaises(ValueError):
+            self.switch_repository_service.get_switch_for_user("uuid_1", 2)
 
     def test_store_switch_data(self):
         # Setup
@@ -52,11 +79,23 @@ class TestRepositoryService(unittest.TestCase):
 
         # Actions
         self.switch_repository_service.store_switch_data(switch)
-        self.switch_repository_service.update_switch_data(updated_switch)
+        self.switch_repository_service.update_switch_data(updated_switch, 1)
         changed_switch = self.switch_repository_service.get_switch("uuid_1")
 
         # Asserts
         self.assertEqual(changed_switch.status_calculation_logic, "new_status_calculation_logic")
+
+    def test_update_switch_data_if_not_allowed_for_user(self):
+        # Setup
+        switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="status_calculation_logic")
+        updated_switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="new_status_calculation_logic")
+
+        # Actions
+        self.switch_repository_service.store_switch_data(switch)
+
+        # Asserts
+        with self.assertRaises(ValueError):
+            self.switch_repository_service.update_switch_data(updated_switch, 2)
 
     def test_update_switch_data_if_not_exists(self):
         # Setup
@@ -68,7 +107,7 @@ class TestRepositoryService(unittest.TestCase):
 
         # Asserts
         with self.assertRaises(ValueError):
-            self.switch_repository_service.update_switch_data(updated_switch)
+            self.switch_repository_service.update_switch_data(updated_switch, 1)
 
     def test_get_switch(self):
         # Setup

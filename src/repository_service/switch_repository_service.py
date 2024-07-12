@@ -1,6 +1,7 @@
 from sqlalchemy.exc import IntegrityError
 from src.repository_service.base_repository_service import BaseRepositoryService
 from src.switch_service.models.switch_model import SwitchModel
+from src.place_service.models.place_model import PlaceModel
 
 
 class SwitchRepositoryService(BaseRepositoryService):
@@ -28,12 +29,13 @@ class SwitchRepositoryService(BaseRepositoryService):
             self.logger.error(f"Error storing switch data into database. Error = {e}")
             raise
 
-    def update_switch_data(self, switch):
+    def update_switch_data(self, switch, user_id):
         """
         Updates an existing switch object in the database.
 
         Args:
             switch (SwitchModel): SwitchModel object to be updated in the database.
+            user_id (str): The user id of the user who owns the switch.
 
         Returns:
             None, raises a ValueError if the switch does not exist in the database.
@@ -41,7 +43,7 @@ class SwitchRepositoryService(BaseRepositoryService):
         try:
             with self.session_maker() as session:
                 try:
-                    existing_switch = self.get_switch(switch.uuid)
+                    existing_switch = self.get_switch_for_user(switch.uuid, user_id)
                 except ValueError as ve:
                     self.logger.error(f"ValueError in get_switch: {ve}")
                     raise ve
@@ -71,19 +73,40 @@ class SwitchRepositoryService(BaseRepositoryService):
             else:
                 raise ValueError(f"Switch with uuid {uuid} does not exist in the database.")
 
-    def delete_switch(self, uuid):
+    def get_switch_for_user(self, uuid, user_id):
+        """
+        Retrieves a switch object from the database based on the switch uuid and user id.
+
+        Args:
+            uuid (str): The uuid of the switch to be retrieved.
+            user_id (str): The user id of the user who owns the switch.
+
+        Returns:
+            SwitchModel: SwitchModel object retrieved from the database. ValueError is raised if the switch does not exist.
+        """
+        with self.session_maker() as session:
+            user_places = session.query(PlaceModel).filter(PlaceModel.user_id == user_id).all()
+            for place in user_places:
+                existing_switch = session.query(SwitchModel).filter(SwitchModel.uuid == uuid,
+                                                                    SwitchModel.place_id == place.id).first()
+                if existing_switch:
+                    return existing_switch
+            raise ValueError(f"Switch with uuid {uuid} does not exist for the user in the database.")
+
+    def delete_switch(self, uuid, user_id):
         """
         Deletes a switch object from the database.
 
         Args:
             uuid (str): The uuid of the switch to be deleted.
+            user_id (str): The user id of the user who owns the switch.
 
         Returns:
             None, raises a ValueError if the switch does not exist in the database.
         """
         try:
             with self.session_maker() as session:
-                existing_switch = self.get_switch(uuid)
+                existing_switch = self.get_switch_for_user(uuid, user_id)
                 session.delete(existing_switch)
                 session.commit()
         except ValueError as ve:

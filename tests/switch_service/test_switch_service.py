@@ -32,42 +32,42 @@ class TestSwitchService(unittest.TestCase):
         # Setup
         mock_switch = Mock()
         mock_switch.status_calculation_logic = 'mock_logic'
-        self.mock_repository_service.get_switch.return_value = mock_switch
+        self.mock_repository_service.get_switch_for_user.return_value = mock_switch
 
         # Actions
-        result = self.switch_service._get_switch_status_calculation_logic('test_switch')
+        result = self.switch_service._get_switch_status_calculation_logic('test_switch', 1)
 
         # Asserts
         self.assertEqual(result, 'mock_logic')
-        self.mock_repository_service.get_switch.assert_called_once_with('test_switch')
+        self.mock_repository_service.get_switch_for_user.assert_called_once_with('test_switch', 1)
 
     def test_get_switch_status_calculation_logic_when_switch_does_not_exist(self):
         # Setup
-        self.mock_repository_service.get_switch.return_value = None
+        self.mock_repository_service.get_switch_for_user.return_value = None
 
         # Actions
-        result = self.switch_service._get_switch_status_calculation_logic('test_switch')
+        result = self.switch_service._get_switch_status_calculation_logic('test_switch', 1)
 
         # Asserts
         self.assertIsNone(result)
-        self.mock_repository_service.get_switch.assert_called_once_with('test_switch')
+        self.mock_repository_service.get_switch_for_user.assert_called_once_with('test_switch', 1)
 
     @patch.object(SwitchService, '_get_switch_status_calculation_logic',
                   return_value="def get_switch_status(): return 'ON'")
     def test_get_switch_status_success(self, mock_get_logic):
-        status = self.switch_service.get_switch_status('test_switch')
+        status = self.switch_service.get_switch_status('test_switch', 1)
         self.assertEqual(status, 'ON')
 
     @patch.object(SwitchService, '_get_switch_status_calculation_logic',
                   return_value="def get_switch_status(): raise Exception('error')")
     def test_get_switch_status_error(self, mock_get_logic):
-        status = self.switch_service.get_switch_status('test_switch')
+        status = self.switch_service.get_switch_status('test_switch', 1)
         self.assertEqual(status, SwitchModel.SWITCH_VALUE_IF_ERROR_OCCURRED)
         self.mock_logger.error.assert_called()
 
     @patch.object(SwitchService, '_get_switch_status_calculation_logic', return_value=None)
     def test_get_switch_status_not_found(self, mock_get_logic):
-        status = self.switch_service.get_switch_status('non_existent_switch')
+        status = self.switch_service.get_switch_status('non_existent_switch', 1)
         self.assertEqual(status, SwitchModel.SWITCH_VALUE_IF_SWITCH_NOT_IMPLEMENTED)
         self.mock_logger.error.assert_called()
 
@@ -86,7 +86,7 @@ class TestSwitchService(unittest.TestCase):
         switch_data = SwitchModel(name='test_switch', uuid="uuid_1", place_id='1', status_calculation_logic='mock_logic')
 
         # Actions
-        self.switch_service.update_switch_data(switch_data)
+        self.switch_service.update_switch_data(switch_data, 1)
 
         # Asserts
-        self.mock_repository_service.update_switch_data.assert_called_once_with(switch_data)
+        self.mock_repository_service.update_switch_data.assert_called_once_with(switch_data, 1)
