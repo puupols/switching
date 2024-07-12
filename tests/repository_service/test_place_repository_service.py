@@ -14,7 +14,7 @@ class TestPlaceRepositoryService(unittest.TestCase):
         self.mock_configuration.get.return_value = "sqlite:///:memory:"
         self.place_repository_service = PlaceRepositoryService(configuration=self.mock_configuration)
         self.place_repository_service.create_database()
-        self.place = PlaceModel(name="Place 1", user_id=1, location_id=1, description="test description")
+        self.place = PlaceModel(id=1, name="Place 1", user_id=1, location_id=1, description="test description")
 
     def tearDown(self):
         self.place_repository_service.metadata.drop_all(self.place_repository_service.engine)
@@ -39,7 +39,7 @@ class TestPlaceRepositoryService(unittest.TestCase):
 
         # Actions
         self.place_repository_service.store_place_data(self.place)
-        result = self.place_repository_service.get_place("Place 1", 1)
+        result = self.place_repository_service.get_place(1, 1)
 
         # Asserts
         self.assertEqual(result.name, expected_name)
@@ -50,7 +50,7 @@ class TestPlaceRepositoryService(unittest.TestCase):
 
         # Actions
         self.place_repository_service.store_place_data(self.place)
-        result = self.place_repository_service.get_place_and_switches("Place 1", 1)
+        result = self.place_repository_service.get_place_and_switches(1, 1)
 
         # Asserts
         self.assertEqual(result.name, expected_name)
@@ -75,7 +75,7 @@ class TestPlaceRepositoryService(unittest.TestCase):
 
         # Actions
         self.place_repository_service.store_place_data(self.place)
-        self.place_repository_service.delete_place("Place 1", 1)
+        self.place_repository_service.delete_place(1, 1)
         with self.place_repository_service.session_maker() as session:
             stored_data = session.query(PlaceModel).all()
 

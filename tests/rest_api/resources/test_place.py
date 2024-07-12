@@ -74,8 +74,8 @@ class TestPlace(unittest.TestCase):
     def test_get_place_success(self):
         # Setup
         place_data = {
-            "name": "test_place",
-            "user_id": 1
+            "user_id": 1,
+            "place_id": 1
         }
         mock_place = PlaceModel(name="test_place", user_id=1, description="some description", location_id=1)
         self.mock_place_service.get_place_and_switches.return_value = mock_place
@@ -101,7 +101,7 @@ class TestPlace(unittest.TestCase):
     def test_delete_place_success(self):
         # Setup
         place_data = {
-            "name": "test_place",
+            "place_id": "1",
             "user_id": 1
         }
         headers = {
@@ -115,4 +115,4 @@ class TestPlace(unittest.TestCase):
 
         # Asserts
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json, {'message': 'Place with the name test_place has been deleted.'})
+        self.assertEqual(response.json, {'message': 'Place with the id 1 has been deleted.'})

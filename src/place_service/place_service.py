@@ -25,31 +25,31 @@ class PlaceService:
         """
         self.place_repository_service.store_place_data(place)
 
-    def get_place(self, place_name, user_id):
+    def get_place(self, place_id, user_id):
         """
         Retrieves the place data from the database.
 
         Arguments:
-            place_name (str): The name of the place to be retrieved.
+            place_id (int): The id of the place to be retrieved.
             user_id (int): The id of the user for the place.
 
         Returns:
             PlaceModel: PlaceModel object containing the place data.
         """
-        return self.place_repository_service.get_place(place_name, user_id)
+        return self.place_repository_service.get_place(place_id, user_id)
 
-    def get_place_and_switches(self, place_name, user_id):
+    def get_place_and_switches(self, place_id, user_id):
         """
         Retrieves the place data with switches from the database.
 
         Arguments:
-            place_name (str): The name of the place to be retrieved.
+            place_id (int): The id of the place to be retrieved.
             user_id (int): The id of the user for the place.
 
         Returns:
             PlaceModel: PlaceModel object containing the place data.
         """
-        return self.place_repository_service.get_place_and_switches(place_name, user_id)
+        return self.place_repository_service.get_place_and_switches(place_id, user_id)
 
     def get_all_places_and_switches_for_user(self, user_id):
         """
@@ -63,15 +63,15 @@ class PlaceService:
         """
         return self.place_repository_service.get_all_places_and_switches_for_user(user_id)
 
-    def delete_place(self, place_name, user_id):
+    def delete_place(self, place_id, user_id):
         """
         Deletes a place from the database.
 
         Arguments:
-            place_name (str): The name of the place to be deleted.
+            place_id (int): The id of the place to be deleted.`
             user_id (int): The id of the user for the place.
 
         Returns:
               None
         """
-        self.place_repository_service.delete_place(place_name, user_id)
+        self.place_repository_service.delete_place(place_id, user_id)

@@ -27,12 +27,12 @@ class PlaceRepositoryService(BaseRepositoryService):
             self.logger.error(f"Error storing place data into database. Error = {e}")
             raise
 
-    def get_place(self, place_name, user_id):
+    def get_place(self, place_id, user_id):
         """
         Retrieves a place object from the database based on the place name and user id.
 
         Args:
-            place_name (str): The name of the place to be retrieved.
+            place_id (int): The id of the place to be retrieved.
             user_id (int): The id of the user for the place.
 
         Returns:
@@ -40,17 +40,17 @@ class PlaceRepositoryService(BaseRepositoryService):
             ValueError: If the place does not exist in the database.
         """
         with self.session_maker() as session:
-            place = session.query(PlaceModel).filter_by(name=place_name, user_id=user_id).first()
+            place = session.query(PlaceModel).filter_by(id=place_id, user_id=user_id).first()
             if place is None:
-                raise ValueError(f"Place with name {place_name} does not exist in the database.")
+                raise ValueError(f"Place with id {place_id} does not exist in the database.")
             return place
 
-    def get_place_and_switches(self, place_name, user_id):
+    def get_place_and_switches(self, place_id, user_id):
         """
         Retrieves a place object from the database based on the place name.
 
         Args:
-            place_name (str): The name of the place to be retrieved.
+            place_id (int): The id of the place to be retrieved.
             user_id (int): The id of the user for the place.
 
         Returns:
@@ -58,9 +58,9 @@ class PlaceRepositoryService(BaseRepositoryService):
             ValueError: If the place does not exist in the database.
         """
         with self.session_maker() as session:
-            place = session.query(PlaceModel).filter_by(name=place_name, user_id=user_id).first()
+            place = session.query(PlaceModel).filter_by(id=place_id, user_id=user_id).first()
             if place is None:
-                raise ValueError(f"Place with name {place_name} does not exist in the database.")
+                raise ValueError(f"Place with id {place_id} does not exist in the database.")
             switches = session.query(SwitchModel).filter_by(place_id=place.id).all()
             location = session.query(LocationModel).filter_by(id=place.location_id).first()
             place.switches = switches
@@ -88,21 +88,21 @@ class PlaceRepositoryService(BaseRepositoryService):
                 place.location = location
             return places
 
-    def delete_place(self, place_name, user_id):
+    def delete_place(self, place_id, user_id):
         """
         Deletes a place object from the database based on the place name and user id.
 
         Args:
-            place_name (str): The name of the place to be deleted.
+            place_id (int): The id of the place to be deleted.
             user_id (int): The id of the user for the place.
 
         Returns:
             None, raises a ValueError if the place does not exist in the database.
         """
         with self.session_maker() as session:
-            place = session.query(PlaceModel).filter_by(name=place_name, user_id=user_id).first()
+            place = session.query(PlaceModel).filter_by(id=place_id, user_id=user_id).first()
             if place is None:
-                raise ValueError(f"Place with name {place_name} does not exist for user {user_id} in the database.")
+                raise ValueError(f"Place with id {place_id} does not exist for user {user_id} in the database.")
             switches = session.query(SwitchModel).filter_by(place_id=place.id).all()
             for switch in switches:
                 session.delete(switch)
