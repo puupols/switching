@@ -82,6 +82,29 @@ class TestSwitchService(unittest.TestCase):
         self.mock_logger.error.assert_called()
         self.mock_repository_service.store_switch_operational_data.assert_called_once()
 
+    def test_test_switch_status_calculation_logic(self):
+        # Setup
+        switch_status_calculation_logic = "def get_switch_status(): return 'ON'"
+
+        # Actions
+        status, error_message = self.switch_service.test_switch_status_calculation_logic(switch_status_calculation_logic)
+
+        # Asserts
+        self.assertEqual(status, 'ON')
+        self.assertEqual(error_message, None)
+
+    def test_test_switch_status_calculation_logic_error(self):
+        # Setup
+        switch_status_calculation_logic = "def get_switch_status(): return test == True"
+
+        # Actions
+        status, error_message = self.switch_service.test_switch_status_calculation_logic(switch_status_calculation_logic)
+        print (error_message)
+        # Asserts
+        self.assertEqual(status, SwitchModel.SWITCH_VALUE_IF_ERROR_OCCURRED)
+        self.assertEqual(str(error_message), "name 'test' is not defined")
+        self.mock_logger.error.assert_called()
+
     @patch.object(SwitchService, '_fetch_switch', return_value=None)
     def test_get_switch_status_not_found(self, mock_get_logic):
         status = self.switch_service.get_switch_status('non_existent_switch', 1)

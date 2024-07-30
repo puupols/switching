@@ -5,6 +5,10 @@ class SwitchStatusRetrivalSchema(Schema):
     uuid = fields.Str(required=True)
     status = fields.Str(dump_only=True)
 
+class SwitchStatusCalculationTestSchema(Schema):
+    switch_calculation_logic = fields.Str(required=True)
+    switch_status = fields.Str(dump_only=True)
+    error_message = fields.Str(dump_only=True)
 
 class SwitchSchema(Schema):
     name = fields.Str(required=True)

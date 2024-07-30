@@ -84,3 +84,25 @@ class TestSwitchStatus(unittest.TestCase):
         # Asserts
         self.assertEqual(response.status_code, 500)
         self.assertIn("Could not process request for the switch with uuid uuid_1", response.json["message"])
+
+    @patch('src.rest_api.resources.switch_status.jwt_required')
+    def test_test_switch_status_calculation_logic_success(self, mock_jwt_required):
+        # Setup
+        mock_jwt_required.return_value = lambda fn: fn
+        self.mock_switch_service.test_switch_status_calculation_logic.return_value = ("ON", None)
+
+        headers = {
+            'Authorization': f'Bearer {self.access_token}',
+            'Content-Type': 'application/json'
+        }
+
+        # Actions
+        with self.app.app_context():
+            response = self.client.post("/switch/status/test_logic", json={"switch_calculation_logic": "def get_switch_status(): return 'ON'"}, headers=headers)
+
+        print(response.json)
+        # Asserts
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {'error_message': None,
+            'switch_calculation_logic': "def get_switch_status(): return 'ON'", 'switch_status': 'ON'
+        })
