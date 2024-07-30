@@ -44,7 +44,7 @@ class SwitchService:
         Returns:
             dict: A dictionary containing the allowed built-ins and service methods.
         """
-        return {'__builtins__': {'datetime': datetime, 'print': print},
+        return {'__builtins__': {'datetime': datetime, 'print': print, 'sorted': sorted},
                 'get_weather_data_after_date': self.weather_service.get_weather_data_after_date,
                 'get_electricity_price_data_after_date': self.electricity_price_service.get_electricity_price_data_after_date}
 
@@ -112,6 +112,30 @@ class SwitchService:
         if switch:
             self._store_switch_status(switch, switch_status)
         return switch_status
+
+    def test_switch_status_calculation_logic(self, switch_status_calculation_logic):
+        """
+        Tests the status calculation logic for the switch.
+
+        Arguments:
+            switch_status_calculation_logic (str): The status calculation logic for the switch.
+
+        Returns:
+            str: The status of the switch.
+            str: Error message if any arise
+        """
+        global_scope = self._get_allowed_scope()
+        error_message = None
+        try:
+            exec(switch_status_calculation_logic, global_scope)
+            get_switch_status = global_scope["get_switch_status"]
+            switch_status = get_switch_status()
+        except Exception as e:
+            self.logger.error(f"Error calculating switch status. The exception: {e}")
+            switch_status = SwitchModel.SWITCH_VALUE_IF_ERROR_OCCURRED
+            error_message = e
+
+        return switch_status, error_message
 
     def store_switch_data(self, switch):
         """
