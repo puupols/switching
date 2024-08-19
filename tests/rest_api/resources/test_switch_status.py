@@ -55,7 +55,7 @@ class TestSwitchStatus(unittest.TestCase):
 
         # Actions
         with self.app.app_context():
-            response = self.client.get("/switch/status", json={"uuid": "uuid_1"}, headers=headers)
+            response = self.client.get("/switch/status/uuid_1", headers=headers)
 
         # Asserts
         self.assertEqual(response.status_code, 200)
@@ -79,7 +79,7 @@ class TestSwitchStatus(unittest.TestCase):
 
         # Actions
         with self.app.app_context():
-            response = self.client.get("/switch/status", json={"uuid": "uuid_1"}, headers=headers)
+            response = self.client.get("/switch/status/uuid_1", headers=headers)
 
         # Asserts
         self.assertEqual(response.status_code, 500)

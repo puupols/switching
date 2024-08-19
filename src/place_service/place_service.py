@@ -21,9 +21,9 @@ class PlaceService:
             place (PlaceModel): PlaceModel object containing the place data.
 
         Returns:
-            PlaceModel: PlaceModel object containing the place data.
+            place_id: Id of the stored place
         """
-        self.place_repository_service.store_place_data(place)
+        return self.place_repository_service.store_place_data(place)
 
     def get_place(self, place_id, user_id):
         """

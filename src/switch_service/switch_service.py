@@ -143,30 +143,34 @@ class SwitchService:
 
         Arguments:
             switch (SwitchModel): The switch data to store.
-        """
-        self.repository_service.store_switch_data(switch)
 
-    def update_switch_data(self, switch, user_id):
+        Return:
+            switch_id: Id of the stored switch
+        """
+        return self.repository_service.store_switch_data(switch)
+
+    def update_switch_data(self, switch, user_id, uuid):
         """
         Updates the switch data in the database.
 
         Arguments:
             switch (SwitchModel): The switch data to update.
-            user_id (str): The id of the user.
+            user_id (int): The id of the user.
+            uuid (str): The uuid of the switch.
         """
-        self.repository_service.update_switch_data(switch, user_id)
+        self.repository_service.update_switch_data(switch, user_id, uuid)
 
-    def get_switch_data(self, switch_uuid):
+    def get_switch_data(self, switch_id):
         """
         Retrieves the switch data from the database.
 
         Arguments:
-            switch_uuid (str): The uuid of the switch.
+            switch_id (str): The id of the switch.
 
         Returns:
             SwitchModel: The switch data.
         """
-        return self.repository_service.get_switch(switch_uuid)
+        return self.repository_service.get_switch(switch_id)
 
     def get_switch_data_for_user(self, switch_uuid, user_id):
         """

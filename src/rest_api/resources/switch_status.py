@@ -11,7 +11,7 @@ from src.switch_service.models.switch_model import SwitchModel
 blp = Blueprint("switch status", __name__, description="Operations on switch status")
 
 
-@blp.route("/switch/status")
+@blp.route("/switch/status/<string:switch_uuid>")
 class SwitchStatus(MethodView):
     """
     SwitchStatus class for handling switch status retrieval requests.
@@ -26,9 +26,8 @@ class SwitchStatus(MethodView):
         self.logger = logging.getLogger(__name__)
 
     @jwt_required()
-    @blp.arguments(SwitchStatusRetrivalSchema)
     @blp.response(200, SwitchStatusRetrivalSchema)
-    def get(self, switch_data):
+    def get(self, switch_uuid):
         """
         Retrieves the status of a switch based on the provided switch data.
 
@@ -38,7 +37,6 @@ class SwitchStatus(MethodView):
         Returns:
             dict: Dictionary containing the name of the switch and its status.
         """
-        switch_uuid = switch_data["uuid"]
         user_id = get_jwt_identity()
         switch_status = self.switch_service.get_switch_status(switch_uuid, user_id)
 

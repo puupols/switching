@@ -5,21 +5,20 @@ class SwitchStatusRetrivalSchema(Schema):
     uuid = fields.Str(required=True)
     status = fields.Str(dump_only=True)
 
+
 class SwitchStatusCalculationTestSchema(Schema):
     switch_calculation_logic = fields.Str(required=True)
     switch_status = fields.Str(dump_only=True)
     error_message = fields.Str(dump_only=True)
 
+
 class SwitchSchema(Schema):
+    id = fields.Int(dump_only=True)
     name = fields.Str(required=True)
     uuid = fields.Str(required=True)
     place_id = fields.Int(required=True)
     status = fields.Str(dump_only=True)
     status_calculation_logic = fields.Str(required=True)
-
-
-class SwitchGetSchema(Schema):
-    uuid = fields.Str(required=True)
 
 
 class UserSchema(Schema):
@@ -32,10 +31,6 @@ class UserSchema(Schema):
 class UserLoginSchema(Schema):
     user_name = fields.Str(required=True)
     password = fields.Str(required=True)
-
-
-class UserGetSchema(Schema):
-    user_name = fields.Str(required=True)
 
 
 class LocationSchema(Schema):
@@ -52,15 +47,5 @@ class PlaceSchema(Schema):
     location = fields.Nested(LocationSchema(), required=True)
 
 
-class PlaceGetSchema(Schema):
-    place_id = fields.Int(required=True)
-    user_id = fields.Int(required=True)
-
-
-class PlaceGetAllSchema(Schema):
-    user_id = fields.Int(required=True)
-
-
 class PlaceSwitchesSchema(PlaceSchema):
     switches = fields.List(fields.Nested(SwitchSchema()), dump_only=True)
-

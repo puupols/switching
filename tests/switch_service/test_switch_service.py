@@ -129,10 +129,10 @@ class TestSwitchService(unittest.TestCase):
                                   status_calculation_logic='mock_logic')
 
         # Actions
-        self.switch_service.update_switch_data(switch_data, 1)
+        self.switch_service.update_switch_data(switch_data, 1, "uuid_1")
 
         # Asserts
-        self.mock_repository_service.update_switch_data.assert_called_once_with(switch_data, 1)
+        self.mock_repository_service.update_switch_data.assert_called_once_with(switch_data, 1, "uuid_1")
 
     def test_store_switch_operational_data(self):
         # Setup

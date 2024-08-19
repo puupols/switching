@@ -4,7 +4,7 @@ from flask import Flask
 from flask_smorest import Api
 from src.user_service.user_service import UserService
 from src.user_service.models.user_model import UserModel
-from src.rest_api.resources.user import Login, User, blp
+from src.rest_api.resources.user import Login, UserItem, blp
 from flask_jwt_extended import create_access_token, JWTManager
 from sqlalchemy.exc import IntegrityError
 import inject
@@ -35,7 +35,7 @@ class TestLogin(unittest.TestCase):
         inject.configure(configure_injector)
 
         self.login_view = Login(user_service=self.mock_user_service)
-        self.user_view = User(user_service=self.mock_user_service)
+        self.user_view = UserItem(user_service=self.mock_user_service)
 
         with self.app.app_context():
             self.access_token = create_access_token(identity='test_user')
@@ -46,7 +46,7 @@ class TestLogin(unittest.TestCase):
     @patch('src.rest_api.resources.user.UserLoginSchema')
     def test_login_success(self, mock_schema):
         # Setup
-        self.mock_user_service.get_user.return_value = UserModel(user_name="test_user", password="hashed_password",
+        self.mock_user_service.get_user_by_user_name.return_value = UserModel(user_name="test_user", password="hashed_password",
                                                                  user_email="test_email")
         self.mock_user_service.verify_password.return_value = True
         mock_schema.return_value.load.return_value = {"username": "test_user", "password": "test_password"}
@@ -135,11 +135,11 @@ class TestLogin(unittest.TestCase):
             'Content-Type': 'application/json'
         }
         # Actions
-        response = self.client.get("/user", json={"user_name": "test_user"}, headers=headers)
+        response = self.client.get("/user/1", json={"user_name": "test_user"}, headers=headers)
 
         # Asserts
         self.assertEqual(response.status_code, 200)
-        self.mock_user_service.get_user.assert_called_once_with("test_user")
+        self.mock_user_service.get_user.assert_called_once_with(1)
 
     @patch('src.rest_api.resources.user.UserSchema')
     @patch('src.rest_api.resources.user.jwt_required')
@@ -148,8 +148,6 @@ class TestLogin(unittest.TestCase):
         # Setup
         mock_get_jwt_identity.return_value = 2
         mock_jwt_required.return_value = lambda fn: fn
-        self.mock_user_service.get_user.return_value = UserModel(id=1, user_name="test_user", password="hashed_password",
-                                                                 user_email="test@test.lv")
         mock_schema.return_value.load.return_value = {"user_name": "test_user"}
 
         headers = {
@@ -157,11 +155,10 @@ class TestLogin(unittest.TestCase):
             'Content-Type': 'application/json'
         }
         # Actions
-        response = self.client.get("/user", json={"user_name": "test_user"}, headers=headers)
+        response = self.client.get("/user/1", headers=headers)
 
         # Asserts
         self.assertEqual(response.status_code, 401)
-        self.mock_user_service.get_user.assert_called_once_with("test_user")
 
 
 #### test to udate user, put method
@@ -185,12 +182,11 @@ class TestLogin(unittest.TestCase):
         }
 
         # Actions
-        response = self.client.put("/user", json={"user_name": "test_user", "password": "test_password",
+        response = self.client.put("/user/1", json={"user_name": "test_user", "password": "test_password",
                                                    "user_email": "test@test.lv"}, headers=headers)
 
         # Asserts
         self.assertEqual(response.status_code, 200)
-        self.mock_user_service.get_user.assert_called_once_with("test_user")
         self.mock_user_service.hash_password.assert_called_once_with("test_password")
         self.mock_user_service.update_user_data.assert_called_once()
 
@@ -201,9 +197,7 @@ class TestLogin(unittest.TestCase):
         # Setup
         mock_get_jwt_identity.return_value = 2
         mock_jwt_required.return_value = lambda fn: fn
-        self.mock_user_service.get_user.return_value = UserModel(id=1, user_name="test_user",
-                                                                 password="hashed_password",
-                                                                 user_email="test@test.lv")
+
         self.mock_user_service.hash_password.return_value = "hashed_password"
         mock_schema.return_value.load.return_value = {"user_name": "test_user", "password": "test_password",
                                                       "user_email": "test@test.lv"}
@@ -214,62 +208,51 @@ class TestLogin(unittest.TestCase):
         }
 
         # Actions
-        response = self.client.put("/user", json={"user_name": "test_user", "password": "test_password",
+        response = self.client.put("/user/1", json={"user_name": "test_user", "password": "test_password",
                                                   "user_email": "test@test.lv"}, headers=headers)
 
         # Asserts
         self.assertEqual(response.status_code, 401)
-        self.mock_user_service.get_user.assert_called_once_with("test_user")
         self.mock_user_service.hash_password.asser_not_called()
         self.mock_user_service.update_user_data.asser_not_called()
 
 
     ### test to delete user
 
-    @patch('src.rest_api.resources.user.UserGetSchema')
     @patch('src.rest_api.resources.user.jwt_required')
     @patch('src.rest_api.resources.user.get_jwt_identity')
-    def test_delete_user_data_success(self, mock_get_jwt_identity, mock_jwt_required, mock_schema):
+    def test_delete_user_data_success(self, mock_get_jwt_identity, mock_jwt_required):
         # Setup
         mock_get_jwt_identity.return_value = 1
         mock_jwt_required.return_value = lambda fn: fn
-        self.mock_user_service.get_user.return_value = UserModel(id=1, user_name="test_user", password="hashed_password",
-                                                                 user_email="test@test.lv")
-        mock_schema.return_value.load.return_value = {"user_name": "test_user"}
 
         headers = {
             'Authorization': f'Bearer {self.access_token}',
             'Content-Type': 'application/json'
         }
         # Actions
-        response = self.client.delete("/user", json={"user_name": "test_user"}, headers=headers)
+        response = self.client.delete("/user/1", headers=headers)
 
         # Asserts
         self.assertEqual(response.status_code, 200)
-        self.mock_user_service.get_user.assert_called_once_with("test_user")
-        self.mock_user_service.delete_user.assert_called_once_with("test_user")
+        self.mock_user_service.delete_user.assert_called_once_with(1)
 
 
-    @patch('src.rest_api.resources.user.UserGetSchema')
     @patch('src.rest_api.resources.user.jwt_required')
     @patch('src.rest_api.resources.user.get_jwt_identity')
-    def test_delete_user_data_unauthorized(self, mock_get_jwt_identity, mock_jwt_required, mock_schema):
+    def test_delete_user_data_unauthorized(self, mock_get_jwt_identity, mock_jwt_required):
         # Setup
         mock_get_jwt_identity.return_value = 2
         mock_jwt_required.return_value = lambda fn: fn
-        self.mock_user_service.get_user.return_value = UserModel(id=1, user_name="test_user", password="hashed_password",
-                                                                 user_email="test@test.lv")
-        mock_schema.return_value.load.return_value = {"user_name": "test_user"}
 
         headers = {
             'Authorization': f'Bearer {self.access_token}',
             'Content-Type': 'application/json'
         }
         # Actions
-        response = self.client.delete("/user", json={"user_name": "test_user"}, headers=headers)
+        response = self.client.delete("/user/1", headers=headers)
 
         # Asserts
         self.assertEqual(response.status_code, 401)
-        self.mock_user_service.get_user.assert_called_once_with("test_user")
         self.mock_user_service.delete_user.assert_not_called()
 
