@@ -48,12 +48,12 @@ class TestUserRepositoryService(unittest.TestCase):
     def test_update_user_data(self):
         # Setup
         user = UserModel(user_name="User 1", user_email="test@test.lv", password="password")
-        updated_user = UserModel(user_name="User 1", user_email="test@testttt.lv", password="new_password")
+        updated_user = UserModel(user_name="User 1", id=1, user_email="test@testttt.lv", password="new_password")
 
         # Actions
         self.user_repository_service.store_user_data(user)
         self.user_repository_service.update_user_data(updated_user)
-        changed_user = self.user_repository_service.get_user("User 1")
+        changed_user = self.user_repository_service.get_user_by_user_name("User 1")
 
         # Asserts
         self.assertEqual(changed_user.user_email, "test@testttt.lv")
@@ -71,6 +71,29 @@ class TestUserRepositoryService(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.user_repository_service.update_user_data(updated_user)
 
+    def test_get_user_by_user_name(self):
+        # Setup
+        user = UserModel(user_name="User 1", user_email="test@test.lv", password="password")
+        expected_name = user.user_name
+
+        # Actions
+        self.user_repository_service.store_user_data(user)
+        result = self.user_repository_service.get_user_by_user_name("User 1")
+
+        # Asserts
+        self.assertEqual(result.user_name, expected_name)
+
+    def test_get_user_by_user_name_if_not_exists(self):
+        # Setup
+        user = UserModel(user_name="User 1", user_email="test@test.lv", password="password")
+
+        # Actions
+        self.user_repository_service.store_user_data(user)
+
+        # Asserts
+        with self.assertRaises(ValueError):
+            self.user_repository_service.get_user_by_user_name("User 2")
+
     def test_get_user(self):
         # Setup
         user = UserModel(user_name="User 1", user_email="test@test.lv", password="password")
@@ -78,7 +101,7 @@ class TestUserRepositoryService(unittest.TestCase):
 
         # Actions
         self.user_repository_service.store_user_data(user)
-        result = self.user_repository_service.get_user("User 1")
+        result = self.user_repository_service.get_user(1)
 
         # Asserts
         self.assertEqual(result.user_name, expected_name)
@@ -92,4 +115,4 @@ class TestUserRepositoryService(unittest.TestCase):
 
         # Asserts
         with self.assertRaises(ValueError):
-            self.user_repository_service.get_user("User 2")
+            self.user_repository_service.get_user(2)

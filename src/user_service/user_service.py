@@ -21,9 +21,22 @@ class UserService:
         Return:
             None
         """
-        self.user_repository_service.store_user_data(user)
+        user_id = self.user_repository_service.store_user_data(user)
+        return user_id
 
-    def get_user(self, user_name):
+    def get_user(self, user_id):
+        """
+        Retrieves the user data from the database.
+
+        Arguments:
+            user_id (int): The id of the user to be retrieved.
+
+        Return:
+            user (UserModel): UserModel object containing the user data.
+        """
+        return self.user_repository_service.get_user(user_id)
+
+    def get_user_by_user_name(self, user_name):
         """
         Retrieves the user data from the database.
 
@@ -33,7 +46,7 @@ class UserService:
         Return:
             user (UserModel): UserModel object containing the user data.
         """
-        return self.user_repository_service.get_user(user_name)
+        return self.user_repository_service.get_user_by_user_name(user_name)
 
     def update_user_data(self, user):
         """
@@ -47,17 +60,17 @@ class UserService:
         """
         self.user_repository_service.update_user_data(user)
 
-    def delete_user(self, user_name):
+    def delete_user(self, user_id):
         """
         Deletes the user data from the database.
 
         Arguments:
-            user_name (str): The name of the user to be deleted.
+            user_id (int): The id of the user to be deleted.
 
         Return:
             None
         """
-        self.user_repository_service.delete_user(user_name)
+        self.user_repository_service.delete_user(user_id)
 
     def hash_password(cls, password):
         """

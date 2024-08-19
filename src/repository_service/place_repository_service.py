@@ -14,18 +14,22 @@ class PlaceRepositoryService(BaseRepositoryService):
         Args: place (PlaceModel): PlaceModel object to be stored in the database.
 
         Returns:
-            None, raises an IntegrityError if the place already exists in the database.
+            place_id: Id of the stored place
+            Raises an IntegrityError if the place already exists in the database.
         """
+        place_id = None
         try:
             with self.session_maker() as session:
                 session.add(place)
                 session.commit()
+                place_id = int(place.id)
         except IntegrityError as ie:
             self.logger.error(f"Place with name {place.name} already exists in the database. Error = {ie}")
             raise
         except Exception as e:
             self.logger.error(f"Error storing place data into database. Error = {e}")
             raise
+        return place_id
 
     def get_place(self, place_id, user_id):
         """

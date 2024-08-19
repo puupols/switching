@@ -5,7 +5,7 @@ from flask_jwt_extended import create_access_token, JWTManager
 from flask_smorest import Api
 from src.place_service.place_service import PlaceService
 from src.location_service.location_service import LocationService
-from src.rest_api.resources.place import Place, Places, blp
+from src.rest_api.resources.place import PlaceItem, PlaceList, blp
 from src.place_service.models.place_model import PlaceModel
 import inject
 
@@ -37,7 +37,7 @@ class TestPlace(unittest.TestCase):
 
         inject.configure(configure_injector)
 
-        self.place_view = Place(place_service=self.mock_place_service, location_service=self.mock_location_service)
+        self.place_view = PlaceItem(place_service=self.mock_place_service)
 
         with self.app.app_context():
             self.access_token = create_access_token(identity=1)
@@ -66,17 +66,12 @@ class TestPlace(unittest.TestCase):
 
         # Asserts
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json, place_data)
         self.mock_location_service.store_location_data.assert_called_once()
         self.mock_location_service.get_location.assert_called_once()
         self.mock_place_service.store_place_data.assert_called_once()
 
     def test_get_place_success(self):
         # Setup
-        place_data = {
-            "user_id": 1,
-            "place_id": 1
-        }
         mock_place = PlaceModel(name="test_place", user_id=1, description="some description", location_id=1)
         self.mock_place_service.get_place_and_switches.return_value = mock_place
         headers = {
@@ -85,7 +80,7 @@ class TestPlace(unittest.TestCase):
         }
 
         # Actions
-        response = self.client.get("/place", json=place_data, headers=headers)
+        response = self.client.get("/place/1", headers=headers)
 
         # Asserts
         self.assertEqual(response.status_code, 200)
@@ -100,10 +95,6 @@ class TestPlace(unittest.TestCase):
 
     def test_delete_place_success(self):
         # Setup
-        place_data = {
-            "place_id": "1",
-            "user_id": 1
-        }
         headers = {
             'Authorization': f'Bearer {self.access_token}',
             'Content-Type': 'application/json'
@@ -111,7 +102,7 @@ class TestPlace(unittest.TestCase):
         self.mock_place_service.delete_place.return_value = None
 
         # Actions
-        response = self.client.delete("/place", json=place_data, headers=headers)
+        response = self.client.delete("/place/1", headers=headers)
 
         # Asserts
         self.assertEqual(response.status_code, 200)

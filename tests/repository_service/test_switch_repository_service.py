@@ -77,40 +77,44 @@ class TestRepositoryService(unittest.TestCase):
 
     def test_update_switch_data(self):
         # Setup
-        switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="status_calculation_logic")
-        updated_switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="new_status_calculation_logic")
+        uuid = 'uuid_1'
+        switch = SwitchModel(name="Switch 1", uuid=uuid, place_id='1', status_calculation_logic="status_calculation_logic")
+        updated_switch = SwitchModel(name="Switch 1", uuid=uuid, place_id='1', status_calculation_logic="new_status_calculation_logic")
 
         # Actions
         self.switch_repository_service.store_switch_data(switch)
-        self.switch_repository_service.update_switch_data(updated_switch, 1)
-        changed_switch = self.switch_repository_service.get_switch("uuid_1")
+        self.switch_repository_service.update_switch_data(updated_switch, 1, uuid)
+        changed_switch = self.switch_repository_service.get_switch("1")
 
         # Asserts
         self.assertEqual(changed_switch.status_calculation_logic, "new_status_calculation_logic")
 
     def test_update_switch_data_if_not_allowed_for_user(self):
         # Setup
-        switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="status_calculation_logic")
-        updated_switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="new_status_calculation_logic")
+        uuid = 'uuid_1'
+        switch = SwitchModel(name="Switch 1", uuid=uuid, place_id='1', status_calculation_logic="status_calculation_logic")
+        updated_switch = SwitchModel(name="Switch 1", uuid=uuid, place_id='1', status_calculation_logic="new_status_calculation_logic")
 
         # Actions
         self.switch_repository_service.store_switch_data(switch)
 
         # Asserts
         with self.assertRaises(ValueError):
-            self.switch_repository_service.update_switch_data(updated_switch, 2)
+            self.switch_repository_service.update_switch_data(updated_switch, 2, uuid)
 
     def test_update_switch_data_if_not_exists(self):
         # Setup
-        switch = SwitchModel(name="Switch 1", uuid='uuid_1', place_id='1', status_calculation_logic="status_calculation_logic")
-        updated_switch = SwitchModel(name="Switch 2", uuid='uuid_2', place_id='1', status_calculation_logic="new_status_calculation_logic")
+        uuid = 'uuid_1'
+        uuid_2 = 'uuid_2'
+        switch = SwitchModel(name="Switch 1", uuid=uuid, place_id='1', status_calculation_logic="status_calculation_logic")
+        updated_switch = SwitchModel(name="Switch 2", uuid=uuid_2, place_id='1', status_calculation_logic="new_status_calculation_logic")
 
         # Actions
         self.switch_repository_service.store_switch_data(switch)
 
         # Asserts
         with self.assertRaises(ValueError):
-            self.switch_repository_service.update_switch_data(updated_switch, 1)
+            self.switch_repository_service.update_switch_data(updated_switch, 1, uuid_2)
 
     def test_get_switch(self):
         # Setup
@@ -119,7 +123,7 @@ class TestRepositoryService(unittest.TestCase):
 
         # Actions
         self.switch_repository_service.store_switch_data(switch)
-        result = self.switch_repository_service.get_switch("uuid_1")
+        result = self.switch_repository_service.get_switch("1")
 
         # Asserts
         self.assertEqual(result.name, expected_name)
