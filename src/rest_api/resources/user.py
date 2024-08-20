@@ -4,13 +4,14 @@ from datetime import timedelta
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from ..schemas import UserSchema, UserLoginSchema
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, create_refresh_token
 from src.user_service.models.user_model import UserModel
 from src.user_service.user_service import UserService
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 blp = Blueprint("users", __name__, description="Operations with users")
+
 
 @blp.route("/user/<int:user_id>")
 class UserItem(MethodView):
@@ -28,7 +29,6 @@ class UserItem(MethodView):
         """
         self.user_service = user_service
         self.logger = logging.getLogger(__name__)
-
 
     @blp.arguments(UserSchema)
     @blp.response(200, UserSchema)
@@ -111,12 +111,13 @@ class UserItem(MethodView):
         try:
             user = self.user_service.get_user(user_id)
         except ValueError:
-            self.logger.error(f"Error getting user data from the database for the user name {user_name}.")
+            self.logger.error(f"Error getting user data from the database for the user id {user_id}.")
             abort(404, message=f"User with the id {user_id} not found.")
         except Exception as e:
             self.logger.error(f"Error getting user data from the database for the user id {user_id}. Error = {e}")
             abort(500, message="An error occurred while getting user data.")
         return user
+
 
 @blp.route("/user")
 class UserList(MethodView):
@@ -198,8 +199,41 @@ class Login(MethodView):
 
         if self.user_service.verify_password(user_data["password"], user.password):
             access_token = create_access_token(user.id, expires_delta=timedelta(hours=1))
+            refresh_token = create_refresh_token(user.id)
             self.logger.info(f"User {user_data['user_name']} logged in!")
-            return {'access_token': access_token}, 200
+            return {'access_token': access_token,
+                    'refresh_token': refresh_token}, 200
         else:
             self.logger.warning("User login incorrect!")
             abort(401, message="Invalid credentials")
+
+
+@blp.route("/refresh")
+class Refresh(MethodView):
+    """
+    Class to handle the refresh token resource
+    """
+
+    @inject.autoparams()
+    def __init__(self, user_service: UserService):
+        """
+        Initializes the Refresh class with the provided UserService.
+        """
+        self.user_service = user_service
+        self.logger = logging.getLogger(__name__)
+
+    @jwt_required(refresh=True)
+    def post(self):
+        """
+        Refreshes the access token with the provided refresh token.
+
+        Returns:
+            dict: Dictionary containing the access token.
+            Error 401: If the refresh token is invalid.
+        """
+        current_user = get_jwt_identity()
+        access_token = create_access_token(identity=current_user, expires_delta=timedelta(hours=1))
+        refresh_token = create_refresh_token(identity=current_user)
+        self.logger.info(f"Access token refreshed for user {current_user}")
+        return {'access_token': access_token,
+                'refresh_token': refresh_token}, 200
