@@ -1,5 +1,5 @@
 from src.electricity_price_service.processors.base_electricity_price_processor import BaseElectricityPriceProcessor
-from datetime import datetime
+from datetime import datetime, timedelta
 from src.electricity_price_service.models.electricity_price_model import ElectricityPriceModel
 
 
@@ -37,7 +37,8 @@ class NordpoolElectricityPriceProcessor(BaseElectricityPriceProcessor):
                 price = float(raw_data['data']['Rows'][i]['Columns'][0]['Value'].replace(',', '.'))
                 price_date_string = raw_date + 'T' + raw_time[:2:]
                 price_date = datetime.strptime(price_date_string, self.NORDPOOL_DATE_FORMAT)
-                electricity_price = ElectricityPriceModel(price_date, price)
+                price_date_lv_timezone = price_date + timedelta(hours=1)
+                electricity_price = ElectricityPriceModel(price_date_lv_timezone, price)
                 electricity_prices.append(electricity_price)
             except (KeyError, ValueError, IndexError) as e:
                 self.logger.error(f'Failed to process Nordpool electricity price data: {e}')

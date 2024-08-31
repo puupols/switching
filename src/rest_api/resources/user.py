@@ -199,7 +199,7 @@ class Login(MethodView):
 
         if self.user_service.verify_password(user_data["password"], user.password):
             access_token = create_access_token(user.id, expires_delta=timedelta(hours=1))
-            refresh_token = create_refresh_token(user.id)
+            refresh_token = create_refresh_token(user.id, expires_delta=timedelta(days=14))
             self.logger.info(f"User {user_data['user_name']} logged in!")
             return {'access_token': access_token,
                     'refresh_token': refresh_token}, 200
@@ -233,7 +233,7 @@ class Refresh(MethodView):
         """
         current_user = get_jwt_identity()
         access_token = create_access_token(identity=current_user, expires_delta=timedelta(hours=1))
-        refresh_token = create_refresh_token(identity=current_user)
+        refresh_token = create_refresh_token(identity=current_user, expires_delta=timedelta(days=14))
         self.logger.info(f"Access token refreshed for user {current_user}")
         return {'access_token': access_token,
                 'refresh_token': refresh_token}, 200
