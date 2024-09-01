@@ -5,7 +5,7 @@ from src.repository_service.switch_repository_service import SwitchRepositorySer
 from src.switch_service.models.switch_model import SwitchModel
 from src.switch_service.models.switch_data_model import SwitchDataModel
 from src.switch_service.models.switch_data_model import SwitchDataType
-from datetime import datetime
+from datetime import datetime, timedelta
 import inject
 import logging
 
@@ -44,7 +44,7 @@ class SwitchService:
         Returns:
             dict: A dictionary containing the allowed built-ins and service methods.
         """
-        return {'__builtins__': {'datetime': datetime, 'print': print, 'sorted': sorted},
+        return {'__builtins__': {'datetime': datetime, 'print': print, 'sorted': sorted, 'timedelta': timedelta},
                 'get_weather_data_after_date': self.weather_service.get_weather_data_after_date,
                 'get_electricity_price_data_after_date': self.electricity_price_service.get_electricity_price_data_after_date}
 
