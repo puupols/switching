@@ -9,11 +9,13 @@
     },
     "handlers": {
         "fileHandler": {
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.TimedRotatingFileHandler",
             "level": "DEBUG",
             "formatter": "standard",
             "filename": "application.log",
-            "mode": "a",
+            "when": "midnight",
+            "interval": 1,
+            "backupCount": 7,
             "encoding": "utf-8"
         },
         "consoleHandler": {
@@ -22,16 +24,18 @@
             "formatter": "standard"
         },
         "RESTHandler": {
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.TimedRotatingFileHandler",
             "level": "DEBUG",
             "formatter": "standard",
             "filename": "rest.log",
-            "mode": "a",
+            "when": "midnight",
+            "interval": 1,
+            "backupCount": 7,
             "encoding": "utf-8"
         }
     },
     "loggers": {
-         "root": {
+        "root": {
             "level": "INFO",
             "handlers": ["fileHandler", "consoleHandler"],
             "propagate": false

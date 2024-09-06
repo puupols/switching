@@ -1,5 +1,6 @@
 import inject
 import logging
+from flask import request
 from flask.views import MethodView
 from src.switch_service.switch_service import SwitchService
 from flask_smorest import Blueprint, abort
@@ -37,13 +38,18 @@ class SwitchStatus(MethodView):
         Returns:
             dict: Dictionary containing the name of the switch and its status.
         """
+        self.logger.info(f"Received GET request for switch status with UUID: {switch_uuid}")
+        self.logger.info(f"Request headers: {request.headers}")
         user_id = get_jwt_identity()
         switch_status = self.switch_service.get_switch_status(switch_uuid, user_id)
+        self.logger.info(f"Switch status retrieved: {switch_status} for UUID: {switch_uuid}")
 
         if switch_status == SwitchModel.SWITCH_VALUE_IF_ERROR_OCCURRED:
+            self.logger.error(f"Error occurred while processing request for switch with UUID: {switch_uuid}")
             abort(500, message=f"Could not process request for the switch with uuid {switch_uuid}. "
                                f"Please check switch status calculation logic")
         if switch_status == SwitchModel.SWITCH_VALUE_IF_SWITCH_NOT_IMPLEMENTED:
+            self.logger.error(f"Switch not implemented or calculation logic not set for UUID: {switch_uuid}")
             abort(500, message=f"Could not process request for the switch with uuid {switch_uuid}. "
                                f"Switch not defined or calculation logic not set")
 
