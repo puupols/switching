@@ -6,7 +6,7 @@ services:
     ports:
       - "5000:5000"
     env_file:
-      - .env
+      - ./.env
     environment:
       - PYTHONPATH=/usr/src/app
       - TZ=Europe/Riga
@@ -19,7 +19,7 @@ services:
   jobs:
     image: puupols/switching-jobs:v1
     env_file:
-      - .env
+      - ./.env
     environment:
       - PYTHONPATH=/usr/src/app
       - TZ=Europe/Riga
@@ -27,12 +27,12 @@ services:
       - api
     networks:
       - switching-network
-    command: ["python", "src/jobs.py"]
+    command: ["python", "run_jobs.py"]
 
   db:
     image: postgres:latest
     env_file:
-      - .env
+      - ./.env
     environment:
       TZ: Europe/Riga
       POSTGRES_DB: ${POSTGRES_DB}
