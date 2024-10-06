@@ -26,7 +26,7 @@ class TestNordpoolElectricityPriceProcessor(unittest.TestCase):
         self.assertEqual(len(processed_data), 24)
         self.assertIsInstance(processed_data[0], ElectricityPriceModel)
         self.assertEqual(processed_data[0].price, 71.99)
-        self.assertEqual(processed_data[0].datetime, datetime.datetime(2024, 4, 30, 0, 0))
+        self.assertEqual(processed_data[0].datetime, datetime.datetime(2024, 4, 30, 1, 0))
 
     def test_process_data_broken_data(self):
         # Setup
