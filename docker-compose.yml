@@ -32,7 +32,7 @@ services:
       - api
     networks:
       - switching-network
-    command: ["python", "src/jobs.py"]
+    command: ["python", "run_jobs.py"]
 
   db:
     image: postgres:latest

@@ -22,8 +22,3 @@ def create_app():
     inject.configure(app_injection_configuration)
     main_app = Main()
     return main_app.return_app()
-
-
-if __name__ == "__main__":
-    app = create_app()
-    app.run()

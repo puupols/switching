@@ -3,3 +3,4 @@ application.log
 rest.log
 .env
 .env_local
+__pycache__/

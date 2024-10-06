@@ -6,7 +6,8 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/ ./src
-COPY tests/ ./tests
+COPY run_app.py ./
+COPY run_jobs.py ./
 COPY logging_config.json ./logging_config.json
 
 EXPOSE 5000
